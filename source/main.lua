@@ -29,20 +29,21 @@ local playerServe = gfx.image.new("images/player-serve-2")
 local playerThrow = gfx.image.new("images/player-throw-2")
 local playerCanSmash = false
 local aiCanSmash = false
-local aiStand = gfx.image.new("images/ai-stand")
-local aiSwing = gfx.image.new("images/ai-swing")
-local aiServe = gfx.image.new("images/ai-serve")
-local aiThrow = gfx.image.new("images/ai-throw")
+local coworkerStand = gfx.image.new("images/coworker-stand")
+local coworkerSwing = gfx.image.new("images/coworker-swing")
+local coworkerServe = gfx.image.new("images/coworker-serve")
+local coworkerThrow = gfx.image.new("images/coworker-throw")
 local ball = gfx.image.new("images/ball-outline")
 local table = gfx.image.new("images/table")
 local backgroundBorder = gfx.image.new("images/background")
 local backgroundOffice = gfx.image.new("images/background-office")
+local backgroundDepartments = gfx.image.new("images/background-departments")
 
-local gameState = "title" -- [title, play, end]
+local gameState = "title"
 local tableEdgeLeft = 110
 local tableEdgeRight = 290
-local tableEdgeTop = 140
-local floorEdge = 190
+local tableEdgeTop = 170
+local floorEdge = 220
 local ballSpeed = 0
 local ballMoving = false
 local ballUpForce = 0
@@ -54,7 +55,7 @@ local ballLastTouched = "none"
 local playerSpeed = 5
 local playerServing = false
 local time = 0
-local timeSpeed = 5
+local timeSpeed = 4
 local seconds = 0
 local score = {0, 0}
 local maxScore = 3
@@ -63,6 +64,13 @@ local showMessage = false
 
 local function resetTimer()
 	playTimer = playdate.timer.new(1000000, 0, 1000000, playdate.easingFunctions.linear)
+end
+
+local function resetSprites()
+	playerSprite:moveTo(55, 150)
+	player2Sprite:moveTo(345, 150)
+	tableSprite:moveTo(200, 190)
+	ballSprite:moveTo(420, 300)
 end
 
 local function resetPoint()
@@ -75,12 +83,6 @@ local function resetPoint()
 	ballSpeedMultiplier = 1
 	ballSpin = 0
 	ballLastTouched = "none"
-	
-	-- Sprites
-	playerSprite:moveTo(55, 120)
-	player2Sprite:moveTo(345, 120)
-	tableSprite:moveTo(200, 160)
-	ballSprite:moveTo(420, 300)
 end
 
 local function resetGame()
@@ -88,85 +90,6 @@ local function resetGame()
 	time = 0
 	seconds = 0
 	score = {0, 0}
-end
-
-local function moveBall()
-	if ballMoving then
-
-		-- ball hits table
-		if ballSprite.x > tableEdgeLeft and ballSprite.x < tableEdgeRight then
-
-			if ballSprite.y > tableEdgeTop then
-				print("ball hits table");
-				
-				ballUpForce = (ballUpForce + 30) * ballBounceMultiplier
-				ballBounceMultiplier *= 0.8
-			end
-		else
-
-			if ballSprite.x > 300 then
-				print("ball hits AI")
-
-				math.randomseed(playdate.getSecondsSinceEpoch())
-				local r = math.random(1, 10)
-
-				if r == 1 then
-					print("AI misses ball")
-
-					score[1] += 1
-					if score[1] == maxScore then
-						gameState = "end"
-					end
-					showMessage = true
-					resetPoint()
-
-				else
-					print("AI hits ball")
-
-					player2Sprite:setImage(aiSwing, playdate.graphics.kImageFlippedX)
-					playdate.timer.performAfterDelay(100, function()
-						player2Sprite:setImage(aiStand, playdate.graphics.kImageFlippedX)
-					end)
-					ballSpeed -= 40 * ballSpeedMultiplier
-					ballUpForce += 20
-					ballBounceMultiplier = 1
-					ballSpeedMultiplier *= 1.001
-					ballLastTouched = "ai"
-
-				end
-				
-			elseif ballSprite.x < 75 then
-				print("ball hits player")
-				
-				score[2] += 1
-				if score[2] == maxScore then
-					gameState = "end"
-				end
-				showMessage = true
-				resetPoint()
-			end
-		end
-		
-		if ballSprite.y > floorEdge then
-			print("ball hits floor")
-			
-			ballUpForce = (ballUpForce + 30) * ballBounceMultiplier
-			ballBounceMultiplier *= 0.8
-		end
-		
-		local verticalSpeed = gravity - ballUpForce
-		ballSprite:moveBy(ballSpeed, verticalSpeed)	
-	end
-	
-	-- use gravity to reduce the ballUpForce
-	if ballUpForce > 5 then
-		ballUpForce = ballUpForce - 5
-	end
-	
-	-- if ball off the screen reset game
-	if ballSprite.x > 400 or ballSprite.x < 0 or ballSprite.y > 240 or ballSprite.y < 0 then
-		-- resetGame()
-	end
 end
 
 local function playerSwings()
@@ -197,7 +120,6 @@ local function playerSwings()
 				print("swing below ball, add "..addSpin.."bottom spin")
 			else
 				print("**** PERFECT ACCURACY ****")
-				
 			end
 			
 			ballUpForce += 20
@@ -236,12 +158,99 @@ local function playerServes()
 	end
 end
 
+local function coworkerSwings()
+	print("coworker swings")
+	
+	math.randomseed(playdate.getSecondsSinceEpoch())
+	local r = math.random(1, 10)
+	
+	if r == 1 then
+		print("AI misses ball")
+	
+		score[1] += 1
+		if score[1] == maxScore then
+			gameState = "end"
+		end
+		showMessage = true
+		resetPoint()
+		resetSprites()
+	
+	else
+		print("AI hits ball")
+	
+		player2Sprite:setImage(coworkerSwing, playdate.graphics.kImageFlippedX)
+		playdate.timer.performAfterDelay(100, function()
+			player2Sprite:setImage(coworkerStand, playdate.graphics.kImageFlippedX)
+		end)
+		ballSpeed -= 40 * ballSpeedMultiplier
+		ballUpForce += 20
+		ballBounceMultiplier = 1
+		ballSpeedMultiplier *= 1.001
+		ballLastTouched = "ai"
+	
+	end
+end
+
+local function moveBall()
+	if ballMoving then
+
+		-- ball hits table
+		if ballSprite.x > tableEdgeLeft and ballSprite.x < tableEdgeRight then
+
+			if ballSprite.y > tableEdgeTop then
+				print("ball hits table");
+				
+				ballUpForce = (ballUpForce + 30) * ballBounceMultiplier
+				ballBounceMultiplier *= 0.8
+			end
+		else
+
+			if ballSprite.x > 300 then
+				coworkerSwings()
+				
+			elseif ballSprite.x < 75 then
+				print("ball hits player")
+				
+				score[2] += 1
+				if score[2] == maxScore then
+					gameState = "end"
+				end
+				showMessage = true
+				resetPoint()
+				resetSprites()
+			end
+		end
+		
+		if ballSprite.y > floorEdge then
+			print("ball hits floor")
+			
+			ballUpForce = (ballUpForce + 30) * ballBounceMultiplier
+			ballBounceMultiplier *= 0.8
+		end
+		
+		local verticalSpeed = gravity - ballUpForce
+		ballSprite:moveBy(ballSpeed, verticalSpeed)	
+	end
+	
+	-- use gravity to reduce the ballUpForce
+	if ballUpForce > 5 then
+		ballUpForce = ballUpForce - 5
+	end
+	
+	-- if ball off the screen reset point
+	if ballSprite.x > 400 or ballSprite.x < 0 or ballSprite.y > 240 or ballSprite.y < 0 then
+		-- todo: figure out who gets the point
+		resetPoint()
+		resetSprites()
+	end
+end
+
 local function initialize()
 	math.randomseed(playdate.getSecondsSinceEpoch())
 
 	playerSprite = gfx.sprite.new(playerStand)
 	player2Sprite = gfx.sprite.new()
-	player2Sprite:setImage(aiStand, playdate.graphics.kImageFlippedX)
+	player2Sprite:setImage(coworkerStand, playdate.graphics.kImageFlippedX)
 	tableSprite = gfx.sprite.new(table)
 	ballSprite = gfx.sprite.new(ball)
 	
@@ -252,13 +261,14 @@ local function initialize()
 	
 	resetGame()
 	resetPoint()
+	resetSprites()
 	resetTimer()
 	
 	gfx.sprite.setBackgroundDrawingCallback(
 		function(x, y, width, height)
 			gfx.setClipRect(x, y, width, height)
-			backgroundBorder:draw(0, 0)
-			backgroundOffice:draw(0, 0)
+			-- backgroundBorder:draw(0, 0)
+			backgroundDepartments:draw(0, 0)
 			
 			if debug then
 				gfx.drawLine(0, tableEdgeTop, 400, tableEdgeTop)
@@ -272,23 +282,60 @@ local function initialize()
 	)
 end
 
-initialize()
+-- local c_tbl =
+-- {
+--   [1] = add,
+--   [2] = save,
+-- }
+-- 
+-- local func = c_tbl[choice]
+-- if(func) then
+--   func()
+-- else
+--   print " The program has been terminated."
+--   print " Thank you!";
+-- end
+
+local function titleScreen()
+	gfx.drawText("SHITTY PING PONG", 120, 40)
+	gfx.drawText("press A to serve and swing", 20, 100)
+	gfx.drawText("press UP and DOWN to move", 20, 120)
+	gfx.drawText("hold B to charge.. release and CRANK to SMASH", 20, 140)
+	gfx.drawText("press A to start", 120, 200)
+end
+
+local function missionScreen()
+	gfx.drawText("WELCOME TO SHITTY PING PONG", 120, 40)
+	gfx.drawText("You work at Shitty Corp", 20, 100)
+	gfx.drawText("You are the lead coder of Shitter", 20, 120)
+	gfx.drawText("BOSS: The site is down, get back to work", 20, 140)
+	gfx.drawText("--: Okay, but we are in the middle of a rally", 20, 160)
+	gfx.drawText("press A to start", 120, 200)
+end
+
+local function endScreen()
+	gfx.drawText("Game Over", 150, 60)
+	gfx.drawText("press A to rematch", 20, 100)
+end
 
 function playdate.update()
 	if gameState == "title" then
-		gfx.drawText("SHITTY PING PONG", 120, 40)
-		gfx.drawText("press A to serve and swing", 20, 100)
-		gfx.drawText("press UP and DOWN to move", 20, 120)
-		gfx.drawText("hold B to charge.. release and CRANK to SMASH", 20, 140)
-		gfx.drawText("press A to start", 120, 200)
+		titleScreen()
+		if playdate.buttonJustPressed(playdate.kButtonA) then
+			gameState = "mission"
+		end
+	elseif gameState == "mission" then
+		gfx.sprite.removeAll()
+		gfx.sprite.update()
+		initialize()
+		missionScreen()
 		if playdate.buttonJustPressed(playdate.kButtonA) then
 			gameState = "play"
 		end
 	elseif gameState == "end" then
 		gfx.sprite.removeAll()
 		gfx.sprite.update()
-		gfx.drawText("Game Over", 150, 60)
-		gfx.drawText("press A to rematch", 20, 100)
+		endScreen()
 		if playdate.buttonJustPressed(playdate.kButtonA) then
 			gameState = "title"
 			gfx.sprite.removeAll()
@@ -297,6 +344,7 @@ function playdate.update()
 			
 		end
 	elseif gameState == "play" then
+		
 		-- Controls
 		if playdate.buttonJustPressed(playdate.kButtonA) then
 			if ballMoving then
@@ -322,9 +370,9 @@ function playdate.update()
 		end
 		time += 1
 		
-		if playerServing then
-			ballSprite:moveTo(98, playerSprite.y - 20)
-		end
+		-- if playerServing then
+		-- 	ballSprite:moveTo(98, playerSprite.y - 20)
+		-- end
 		
 		local paddleLocation = playerSprite.y - 10
 		
