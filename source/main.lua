@@ -59,6 +59,8 @@ local score = {0, 0}
 local maxScore = 3
 local gravity = 20
 local showMessage = false
+local guageMax = 7
+local gaugeLevel = 0
 
 local function resetTimer()
 	playTimer = playdate.timer.new(1000000, 0, 1000000, playdate.easingFunctions.linear)
@@ -71,8 +73,35 @@ local function resetSprites()
 	ballSprite:moveTo(420, 300)
 end
 
+local function renderSpinMeter()
+	gfx.setColor(gfx.kColorBlack)
+	gfx.sprite.setBackgroundDrawingCallback(
+		function(x, y, width, height)
+			
+			if ballSpin > 0 then
+				--print("RIGHT spin")
+				gaugeLevel = math.floor(ballSpin / 10)
+				guageLevel = gaugeLevel > guageMax and guageMax or gaugeLevel
+				-- print("Guage level"..guageLevel)
+				for i=0, gaugeLevel do
+					local xValue = 202 + (i * 12)
+					-- print("xValue"..xValue)
+					gfx.fillRect(xValue, 200, 10, 10)
+				end
+			elseif ballSpin < 0 then
+				--print("LEFT spin")
+				gaugeLevel = math.floor(math.abs(ballSpin) / 10)
+				guageLevel = gaugeLevel > guageMax and guageMax or gaugeLevel
+				for i=0, guageLevel do
+					local xValue = 177 - (i * 12)
+					gfx.fillRect(xValue, 200, 10, 10)
+				end
+			end
+		end
+	)
+end
+
 local function resetPoint()
-	-- Global variables
 	ballSpeed = 0
 	ballMoving = false
 	ballUpForce = 0
@@ -81,6 +110,9 @@ local function resetPoint()
 	ballSpeedMultiplier = 1
 	ballSpin = 0
 	ballLastTouched = "none"
+	gaugeLevel = 0
+	timeSpeed = 4
+	renderSpinMeter()
 end
 
 local function resetGame()
@@ -115,41 +147,10 @@ local function calculateSpin(paddleLocation)
 end
 
 local function playHitSound()
-	-- sound test
 	local synth = snd.synth.new(snd.kWaveSawtooth)
 	synth:setDecay(0.1)
 	synth:setSustain(0)
 	synth:playNote(220)
-end
-
-local function renderSpinMeter(gaugeLevel, guageMax)
-	gfx.sprite.setBackgroundDrawingCallback(
-		function(x, y, width, height)
-			if ballSpin > 0 then
-				--print("RIGHT spin")
-				for i=0,gaugeLevel do
-					local xValue = 202 + (i * 12)
-					-- print("xValue"..xValue)
-					gfx.fillRect(xValue, 200, 10, 10)
-				end
-			elseif ballSpin < 0 then
-				--print("LEFT spin")
-				for i=0,math.abs(gaugeLevel) do
-					local xValue = 177 - (i * 12)
-					gfx.fillRect(xValue, 200, 10, 10)
-				end
-			end
-		end
-	)
-end
-
-local function refreshSpinMeter()
-	gfx.setColor(gfx.kColorBlack)
-	
-	local guageMax = 8
-	local gaugeLevel = math.floor(ballSpin / 10)
-	
-	renderSpinMeter(gaugeLevel, guageMax)
 end
 
 local function playerHits(paddleLocation)
@@ -157,7 +158,7 @@ local function playerHits(paddleLocation)
 	
 	playHitSound()
 	calculateSpin(paddleLocation)
-	refreshSpinMeter()
+	renderSpinMeter()
 	
 	ballUpForce += 20
 	ballSpeedMultiplier *= 1.001
@@ -179,7 +180,7 @@ local function playerSwings()
 	end)
 	
 	-- ball is near player
-	if ballSprite.x < 150 then
+	if ballSprite.x < 100 then
 		print("ball near player")
 		
 		local paddleLocation = playerSprite.y - 10
@@ -224,7 +225,7 @@ local function coworkerHits()
 	
 	local paddleLocation = coworkerSprite.y - 10
 	calculateSpin(paddleLocation)
-	refreshSpinMeter()
+	renderSpinMeter()
 	
 	ballSpeed -= 40 * ballSpeedMultiplier
 	ballUpForce += 20
@@ -265,7 +266,7 @@ local function moveBall()
 
 			if ballSprite.y > tableEdgeTop then
 				print("ball hits table");
-				
+				playHitSound()
 				ballUpForce = (ballUpForce + 30) * ballBounceMultiplier
 				ballBounceMultiplier *= 0.8
 			end
@@ -367,11 +368,12 @@ end
 
 local function endScreen()
 	gfx.drawText("Game Over", 150, 60)
-	gfx.drawText("Score: XXX      press A to restart", 20, 100)
+	gfx.drawText("press A to restart", 20, 100)
 end
 
 function playdate.update()
 	if gameState == "play" then
+		
 		-- Controls
 		if playdate.buttonJustPressed(playdate.kButtonA) then
 			if ballMoving then
@@ -382,15 +384,23 @@ function playdate.update()
 		end
 		if playdate.buttonIsPressed(playdate.kButtonUp) then
 			playerSprite:moveBy(0, -playerSpeed)
+			if debug then
+				gfx.drawLine(0, playerSprite.y, 400, playerSprite.y)
+			end
 		end
 		if playdate.buttonIsPressed(playdate.kButtonDown) then
 			playerSprite:moveBy(0, playerSpeed)
+			gfx.drawLine(0, playerSprite.y, 400, playerSprite.y)
+		end
+		
+		-- Coworker ai
+		if ballMoving then
+			coworkerSprite:moveTo(coworkerSprite.x, ballSprite.y)
 		end
 		
 		-- Time
 		if time % timeSpeed == 0 then
 			moveBall()
-			refreshSpinMeter()
 		end
 		if time % 30 == 0 then
 			seconds += 1
@@ -415,17 +425,18 @@ function playdate.update()
 		-- UI
 		gfx.drawText(score[1], 55, 220)
 		gfx.drawText(score[2], 340, 220)
-		gfx.drawText("SPIN " .. ballSpin, 160, 220)
+		gfx.drawText("SPIN " .. math.floor(ballSpin), 160, 220)
 		
 		if playerCanSmash then
 			gfx.drawText("SMASH", 100, 220)
-		elseif aiCanSmash then
+		end
+		if aiCanSmash then
 			gfx.drawText("SMASH", 300, 220)
 		end
 		
-		-- if debug == false then
-		-- 	gfx.drawText("SHITTY PING-PONG", 380, 20)
-		-- end
+		if debug == false then
+			gfx.drawText("SHITTER HQ", 150, 50)
+		end
 			
 		-- On-screen messages
 		if showMessage then
