@@ -28,10 +28,12 @@ local playerStand = gfx.image.new("images/player-stand-2")
 local playerSwing = gfx.image.new("images/player-swing-2")
 local playerServe = gfx.image.new("images/player-serve-2")
 local playerThrow = gfx.image.new("images/player-throw-2")
+local playerSmash = gfx.image.new("images/player-smash")
 local coworkerStand = gfx.image.new("images/coworker-stand")
 local coworkerSwing = gfx.image.new("images/coworker-swing")
 local coworkerServe = gfx.image.new("images/coworker-serve")
 local coworkerThrow = gfx.image.new("images/coworker-throw")
+local coworkerSmash = gfx.image.new("images/coworker-smash")
 local ball = gfx.image.new("images/ball-outline")
 local table = gfx.image.new("images/table")
 local backgroundOffice = gfx.image.new("images/background-office")
@@ -77,22 +79,17 @@ local function renderSpinMeter()
 	gfx.setColor(gfx.kColorBlack)
 	gfx.sprite.setBackgroundDrawingCallback(
 		function(x, y, width, height)
-			
 			if ballSpin > 0 then
-				--print("RIGHT spin")
 				gaugeLevel = math.floor(ballSpin / 10)
 				guageLevel = gaugeLevel > guageMax and guageMax or gaugeLevel
-				-- print("Guage level"..guageLevel)
-				for i=0, gaugeLevel do
+				for i=0, gaugeLevel - 1 do
 					local xValue = 202 + (i * 12)
-					-- print("xValue"..xValue)
 					gfx.fillRect(xValue, 200, 10, 10)
 				end
 			elseif ballSpin < 0 then
-				--print("LEFT spin")
 				gaugeLevel = math.floor(math.abs(ballSpin) / 10)
 				guageLevel = gaugeLevel > guageMax and guageMax or gaugeLevel
-				for i=0, guageLevel do
+				for i=0, guageLevel - 1 do
 					local xValue = 177 - (i * 12)
 					gfx.fillRect(xValue, 200, 10, 10)
 				end
@@ -129,19 +126,19 @@ local function resetScreen()
 end
 
 local function calculateSpin(paddleLocation)
-	print("calclate spin")
-	print("paddleLocation" .. paddleLocation)
-	print("ballSprite.y" .. ballSprite.y)
+	--print("calclate spin")
+	--print("paddleLocation" .. paddleLocation)
+	--print("ballSprite.y" .. ballSprite.y)
 	if paddleLocation < ballSprite.y then
 		local addSpin = ballSprite.y - paddleLocation
 		ballSpin -= addSpin
-		print("swing ABOVE ball, spin "..addSpin.." LEFT ")
+		--print("swing ABOVE ball, spin "..addSpin.." LEFT ")
 	elseif paddleLocation > ballSprite.y then
 		local addSpin = paddleLocation - ballSprite.y
 		ballSpin += addSpin
-		print("swing BELOW ball, spin "..addSpin.." RIGHT")
+		--print("swing BELOW ball, spin "..addSpin.." RIGHT")
 	else
-		print("**** PERFECT ACCURACY ****")
+		--print("**** PERFECT ACCURACY ****")
 	end
 	
 end
@@ -154,7 +151,7 @@ local function playHitSound()
 end
 
 local function playerHits(paddleLocation)
-	print("player vertically aligned to ball, a HIT!")
+	--print("player vertically aligned to ball, a HIT!")
 	
 	playHitSound()
 	calculateSpin(paddleLocation)
@@ -171,8 +168,8 @@ local function playerHits(paddleLocation)
 end
 
 local function playerSwings()
-	print("  ")
-	print("player swings")
+	--print("  ")
+	--print("player swings")
 	
 	playerSprite:setImage(playerSwing)
 	playdate.timer.performAfterDelay(100, function()
@@ -181,24 +178,23 @@ local function playerSwings()
 	
 	-- ball is near player
 	if ballSprite.x < 100 then
-		print("ball near player")
+		--print("ball near player")
 		
 		local paddleLocation = playerSprite.y - 10
-		if paddleLocation < ballSprite.y + 30 and paddleLocation > ballSprite.y - 30 then
-		-- if paddleLocation < ballSprite.y + 30 and paddleLocation > ballSprite.y - 30 and ballLastTouched ~= "player" then
+		if paddleLocation < ballSprite.y + 30 and paddleLocation > ballSprite.y - 30 and ballLastTouched ~= "player" then
 			playerHits(paddleLocation)
 		else
-			print("player not vertically aligned to ball, a MISS!")
+			--print("player not vertically aligned to ball, a MISS!")
 		end
 	end
 end
 
 local function playerServes()
 	if playerServing == true then
-		print("player serves")
+		--print("player serves")
 		playerSprite:setImage(playerThrow)
 		local throwBall = ballSprite.y - 30
-		print(throwBall)
+		--print(throwBall)
 		playerServing = false
 		ballSprite:moveTo(98, throwBall)
 		ballUpForce += 15
@@ -208,15 +204,20 @@ local function playerServes()
 			playerSprite:setImage(playerStand)
 		end)
 	else
-		print("player serving")
+		--print("player serving")
 		ballSprite:moveTo(playerSprite.x + 38, playerSprite.y - 20)
 		playerSprite:setImage(playerServe)
 		playerServing = true
 	end
 end
 
+local function playerSmashes()
+	--print("player smash wind up")
+	playerSprite:setImage(playerSmash)
+end
+
 local function coworkerHits()
-	print("coworker hits ball")
+	--print("coworker hits ball")
 	playHitSound()
 	coworkerSprite:setImage(coworkerSwing, playdate.graphics.kImageFlippedX)
 	playdate.timer.performAfterDelay(100, function()
@@ -235,14 +236,14 @@ local function coworkerHits()
 end
 
 local function coworkerSwings()
-	print("  ")
-	print("coworker swings")
+	--print("  ")
+	--print("coworker swings")
 	
 	math.randomseed(playdate.getSecondsSinceEpoch())
 	local r = math.random(1, 10)
 	
 	if r == 1 then
-		print("AI misses ball")
+		--print("AI misses ball")
 	
 		score[1] += 1
 		if score[1] == maxScore then
@@ -253,7 +254,7 @@ local function coworkerSwings()
 		resetSprites()
 	
 	else
-		print("AI hits ball")
+		--print("AI hits ball")
 		coworkerHits()
 	end
 end
@@ -265,7 +266,7 @@ local function moveBall()
 		if ballSprite.x > tableEdgeLeft and ballSprite.x < tableEdgeRight then
 
 			if ballSprite.y > tableEdgeTop then
-				print("ball hits table");
+				--print("ball hits table");
 				playHitSound()
 				ballUpForce = (ballUpForce + 30) * ballBounceMultiplier
 				ballBounceMultiplier *= 0.8
@@ -276,7 +277,7 @@ local function moveBall()
 				coworkerSwings()
 				
 			elseif ballSprite.x < 75 then
-				print("ball hits player")
+				--print("ball hits player")
 				
 				score[2] += 1
 				if score[2] == maxScore then
@@ -289,7 +290,7 @@ local function moveBall()
 		end
 		
 		if ballSprite.y > floorEdge then
-			print("ball hits floor")
+			--print("ball hits floor")
 			
 			ballUpForce = (ballUpForce + 30) * ballBounceMultiplier
 			ballBounceMultiplier *= 0.8
@@ -371,6 +372,10 @@ local function endScreen()
 	gfx.drawText("press A to restart", 20, 100)
 end
 
+local function renderUI()
+	
+end
+
 function playdate.update()
 	if gameState == "play" then
 		
@@ -381,6 +386,17 @@ function playdate.update()
 			else
 				playerServes()
 			end
+		end
+		if playdate.buttonIsPressed(playdate.kButtonB) then
+			if ballMoving then
+				playerSmashes()
+			end
+		end
+		if playdate.buttonJustReleased(playdate.kButtonB) then
+			playerSprite:setImage(playerSwing)
+			playdate.timer.performAfterDelay(300, function()
+				playerSprite:setImage(playerStand)
+			end)
 		end
 		if playdate.buttonIsPressed(playdate.kButtonUp) then
 			playerSprite:moveBy(0, -playerSpeed)
@@ -426,13 +442,6 @@ function playdate.update()
 		gfx.drawText(score[1], 55, 220)
 		gfx.drawText(score[2], 340, 220)
 		gfx.drawText("SPIN " .. math.floor(ballSpin), 160, 220)
-		
-		if playerCanSmash then
-			gfx.drawText("SMASH", 100, 220)
-		end
-		if aiCanSmash then
-			gfx.drawText("SMASH", 300, 220)
-		end
 		
 		if debug == false then
 			gfx.drawText("SHITTER HQ", 150, 50)
