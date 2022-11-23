@@ -1,0 +1,10 @@
+-- TODO
+-- split into multiple files/classes
+-- what if the players and table are a smily face of the playdate itself, optical illusion
+-- Smash type swing that requires a pause and using the crank to do a smash
+-- ball should go into AI or player hand depending on who won last show
+-- ai better movement, 
+-- coworker movement and serve functionality
+-- make sure correct player gets point, whoHitLast() and must bounce on table
+-- make it time sensitive where you can only play one game and have to play next game the net day or week
+-- hold A to charge swing
