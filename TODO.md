@@ -1,10 +1,12 @@
--- TODO
--- split into multiple files/classes
--- what if the players and table are a smily face of the playdate itself, optical illusion
--- Smash type swing that requires a pause and using the crank to do a smash
--- ball should go into AI or player hand depending on who won last show
--- ai better movement, 
--- coworker movement and serve functionality
--- make sure correct player gets point, whoHitLast() and must bounce on table
--- make it time sensitive where you can only play one game and have to play next game the net day or week
--- hold A to charge swing
+# TODO
+- split into multiple files/classes
+- Smash type swing that requires a pause and using the crank to do a smash
+- make sure correct player gets point
+- ball should go into AI or player hand depending on who won last show
+- coworker movement and serve functionality
+- hold A to charge swing
+- limit player vertical movement
+- B button to return a smash
+
+# IDEAS
+- the table and players kinda look like a face, i wonder if there is a way to use that

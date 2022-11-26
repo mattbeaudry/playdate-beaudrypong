@@ -14,27 +14,19 @@ local playerServe = gfx.image.new("images/player-serve-2")
 local playerThrow = gfx.image.new("images/player-throw-2")
 local playerSmash = gfx.image.new("images/player-smash")
 
-local playerSmashPower = 0
 local maxSmashPower = 100
 
 function Player:new()
 	
 	local self = gfx.sprite.new(playerStand)
+	self.playerSmashPower = 5
 	
 	function self:resetPoint()
-		playerSmashPower = 0
+		self.playerSmashPower = 0
 	end
 	
 	function self:resetGame()
 		playerServing = false
-	end
-	
-	function self:move(x,y)
-		self:moveTo(x, y)
-	end
-	
-	function self:move(x,y)
-		self:moveTo(x, y)
 	end
 	
 	function self:throw()
@@ -54,6 +46,19 @@ function Player:new()
 			self:setImage(playerStand)
 		end)
 	end
+	
+	function self:smashWindUp()
+		self:setImage(playerSmash)
+	end
+	
+	function self:smashWinding()
+		--print (playerSmashPower)
+		self.playerSmashPower += 1
+	end
+	
+	-- function self:update()
+	-- 	gfx.drawText(self.playerSmashPower, 100, 100)
+	-- end
 	
 	return self
 end
