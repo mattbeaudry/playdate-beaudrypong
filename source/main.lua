@@ -4,7 +4,7 @@ import "CoreLibs/object"
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
 import "player"
-import "coworker"
+-- import "coworker"
 import "story"
 
 player = Player:new()
@@ -14,6 +14,7 @@ story = Story:new()
 local debug = false
 
 local gfx <const> = playdate.graphics
+local font = gfx.font.new('font/Nano Sans 2X/Nano Sans 2X')
 local snd <const> = playdate.sound
 
 local coworkerSprite = nil
@@ -78,13 +79,13 @@ local function renderSpinMeter()
 	gfx.sprite.setBackgroundDrawingCallback(function()
 		if ballSpin > 0 then
 			for i=0, gaugeLevel - 1 do
-				local xValue = 202 + (i * 12)
-				gfx.fillRect(xValue, 200, 10, 10)
+				local xValue = 212 + (i * 12)
+				gfx.fillRect(xValue, 220, 10, 10)
 			end
 		elseif ballSpin < 0 then
 			for i=0, math.abs(gaugeLevel) - 1 do
 				local xValue = 177 - (i * 12)
-				gfx.fillRect(xValue, 200, 10, 10)
+				gfx.fillRect(xValue, 220, 10, 10)
 			end
 		end
 	end)
@@ -190,25 +191,33 @@ end
 local function hit(paddleLocation)
 	playHitSound()
 	calculateSpin(paddleLocation)
-	
 	ballUpForce += hitUpForce
 	ballSpeedMultiplier *= 1.001
 	ballLastTouched = "player"
+	
 	if ballSpeed == 0 then
 		ballSpeed += 20
 	else 
 		ballSpeed += 40 * ballSpeedMultiplier
 	end
+	
+	gfx.drawLine(0, 0, 100, 100)
 end
 
 local function swing()
 	player:swing()
-	
 	if ballSprite.x < 100 then
 		local paddleLocation = player.y - 10
 		if paddleLocation < ballSprite.y + 30 and paddleLocation > ballSprite.y - 30 and ballLastTouched ~= "player" then
 			hit(paddleLocation)
 		end
+	end
+end
+
+local function updateScore(who, howMuch)
+	score[who] += howMuch
+	if score[who] == maxScore then
+		gameState = "end"
 	end
 end
 
@@ -232,10 +241,7 @@ local function moveBall()
 				coworkerSwings()
 			elseif ballSprite.x < 75 then
 				--ball hits player
-				score[2] += 1
-				if score[2] == maxScore then
-					gameState = "end"
-				end
+				updateScore(2,1)
 				showMessage = true
 				resetPoint()
 				resetSprites()
@@ -248,18 +254,33 @@ local function moveBall()
 			ballBounceMultiplier *= 0.8
 		end
 		
-		-- ball hits top of screen
+		-- ball hits ceiling
 		if ballSprite.y < 0 then
 			ballUpForce = (ballUpForce - 30) * ballBounceMultiplier
 		end
 		
-		-- if ball off the screen
+		-- ball off the screen
 		if ballSprite.x > 400 or ballSprite.x < 0 or ballSprite.y > 240 then
-			-- todo: figure out who gets the point
+			if ballLastTouched == "player" then
+				print("player touched last, coworker +1 point")
+				updateScore(2, 1)
+			elseif ballLastTouched == "coworker" then
+				print("coworker touched last, player +1 point")
+				updateScore(1, 1)
+			elseif ballLastTouched == ("table" or "none") then
+				if ballSprite.x < 200 then
+					print("last touched none/table, LEFT side of screen, coworker +1 point")
+					updateScore(2, 1)
+				else
+					print("last touched none/table, RIGHT side of screen, coworker +1 point")
+					updateScore(1, 1)
+				end
+			end
 			resetPoint()
 			resetSprites()
 		end
 		
+		-- move ball
 		local verticalSpeed = gravity - ballUpForce
 		ballSprite:moveBy(ballSpeed, verticalSpeed)	
 		
@@ -267,8 +288,6 @@ local function moveBall()
 		if ballUpForce > 5 then
 			ballUpForce = ballUpForce - 5
 		end
-		
-		
 	end
 end
 
@@ -309,15 +328,14 @@ local function initialize()
 end
 
 local function renderUI()
+
+	gfx.drawText("SHITTER HQ", 150, 6)
+
+	-- scoreboard
 	gfx.drawText(score[1], 55, 220)
 	gfx.drawText(score[2], 340, 220)
-	gfx.drawText("SPIN " .. math.floor(ballSpin), 160, 220)
 	
-	if debug == false then
-		gfx.drawText("SHITTER HQ", 150, 6)
-	end
-
-	-- On-screen messages
+	-- point indicator
 	if showMessage then
 		gfx.drawText("POINT!", 200, 130)
 		playdate.timer.performAfterDelay(2000, function()
@@ -325,24 +343,31 @@ local function renderUI()
 		end)
 	end
 	
+	-- smash power meter
+	if player.playerSmashPower > 0 then
+		gfx.drawText(player.playerSmashPower, 100, 100)
+	end
+	
+	-- spin gauge
+	gfx.drawRect(139, 218, 50, 14)
+	gfx.drawRect(210, 218, 50, 14)
 	if gaugeLevel >= gaugeMax then
 		gfx.drawText("C SMASH!", 300, 100)
 	elseif gaugeLevel <= -gaugeMax then
 		gfx.drawText("P SMASH!", 100, 100)
 	end
 	
-	-- Debug INFO
+	-- debug info
 	if debug then
 		gfx.drawText("time: " .. seconds .. " BSpeed: " .. ballSpeed .. "  BUpForce: " .. ballUpForce .. "  BBounceHeight: " .. ballBounceHeight, 5, 5)	
 		gfx.drawText("ball.x" .. ballSprite.x .. " ball.y" .. ballSprite.y .. " paddle.y" .. paddleLocation, 5, 30)
-	end
-	
-	if player.playerSmashPower > 0 then
-		gfx.drawText(player.playerSmashPower, 100, 100)
+		gfx.drawText("SPIN " .. math.floor(ballSpin), 160, 220)
 	end
 end
 
 function playdate.update()
+	gfx.setFont(font)
+	
 	if gameState == "play" then
 		
 		-- Controls
@@ -370,21 +395,25 @@ function playdate.update()
 			end
 		end
 		if playdate.buttonIsPressed(playdate.kButtonUp) then
-			player:moveBy(0, -playerSpeed)
-			if playerServing then
-				ballSprite:moveBy(0, -playerSpeed)
-			end
-			if debug then
-				gfx.drawLine(0, player.y, 400, player.y)
+			if player.y > 75 then 
+				player:moveBy(0, -playerSpeed)
+				if playerServing then
+					ballSprite:moveBy(0, -playerSpeed)
+				end
+				if debug then
+					gfx.drawLine(0, player.y, 400, player.y)
+				end
 			end
 		end
 		if playdate.buttonIsPressed(playdate.kButtonDown) then
-			player:moveBy(0, playerSpeed)
-			if playerServing then
-				ballSprite:moveBy(0, playerSpeed)
-			end
-			if debug then
-				gfx.drawLine(0, player.y, 400, player.y)
+			if player.y < 190 then 
+				player:moveBy(0, playerSpeed)
+				if playerServing then
+					ballSprite:moveBy(0, playerSpeed)
+				end
+				if debug then
+					gfx.drawLine(0, player.y, 400, player.y)
+				end
 			end
 		end
 		
@@ -415,6 +444,12 @@ function playdate.update()
 	elseif gameState == "title" then
 		story:titleScreen()
 		if playdate.buttonJustPressed(playdate.kButtonA) then
+			gameState = "howto"
+		end
+	elseif gameState == "howto" then
+		resetScreen()
+		story:howToPlay()
+		if playdate.buttonJustPressed(playdate.kButtonA) then
 			gameState = "mission"
 		end
 	elseif gameState == "mission" then
@@ -428,7 +463,7 @@ function playdate.update()
 		gfx.sprite.removeAll()
 		gfx.sprite.update()
 		resetScreen()
-		story:endScreen()
+		story:endScreen(score, maxScore)
 		if playdate.buttonJustPressed(playdate.kButtonA) then
 			gameState = "title"
 			gfx.sprite.removeAll()

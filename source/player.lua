@@ -52,13 +52,8 @@ function Player:new()
 	end
 	
 	function self:smashWinding()
-		--print (playerSmashPower)
 		self.playerSmashPower += 1
 	end
-	
-	-- function self:update()
-	-- 	gfx.drawText(self.playerSmashPower, 100, 100)
-	-- end
 	
 	return self
 end
