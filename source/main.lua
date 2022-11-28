@@ -55,7 +55,7 @@ local score = {0, 0}
 local maxScore = 3
 local gravity = 20
 local showMessage = false
-local gaugeMax = 3
+local gaugeMax = 4
 local gaugeLevel = 0
 
 local function resetTimer()
@@ -72,7 +72,7 @@ end
 local function renderSpinMeter()
 	gfx.setColor(gfx.kColorBlack)
 	gaugeLevel = math.floor(ballSpin / 10)
-	if math.abs(gaugeLevel) > gaugeMax then
+	if math.abs(gaugeLevel) >= gaugeMax then
 		gaugeLevel = gaugeMax
 	end
 	
@@ -119,13 +119,33 @@ local function resetScreen()
 	gfx.fillRect(0, 0, 400, 240)
 end
 
-local function calculateSpin(paddleLocation)
+local function calculateSpin(paddleLocation, person)
+	if person == 'player' then
+		gfx.drawLine(player.x+30,player.y-30,player.x + 70, player.y-30)
+		gfx.drawLine(player.x+30,player.y+20,player.x + 70, player.y+20)
+	elseif person =='coworker' then
+		gfx.drawLine(coworkerSprite.x-30,coworkerSprite.y-30,coworkerSprite.x-70, coworkerSprite.y-30)
+		gfx.drawLine(coworkerSprite.x-30,coworkerSprite.y+20,coworkerSprite.x-70, coworkerSprite.y+20)
+	end
+	
 	if paddleLocation < ballSprite.y then
 		local addSpin = ballSprite.y - paddleLocation
 		ballSpin -= addSpin
+		-- hit spin indicator
+		if person == 'player' then
+			gfx.drawText("SPIN -", player.x+30, player.y+35)
+		elseif person == 'coworker' then
+			gfx.drawText("SPIN -", coworkerSprite.x-30, coworkerSprite.y+35)
+		end
 	elseif paddleLocation > ballSprite.y then
 		local addSpin = paddleLocation - ballSprite.y
 		ballSpin += addSpin
+		-- hit spin indicator
+		if person == 'player' then
+			gfx.drawText("SPIN +", player.x+30, player.y-45)
+		elseif person == 'coworker' then
+			gfx.drawText("SPIN +", coworkerSprite.x-30, coworkerSprite.y-45)
+		end
 	else
 		--print("**** PERFECT ACCURACY SHOT -- Do something special? ****")
 	end
@@ -147,7 +167,7 @@ local function coworkerHits()
 	end)
 	
 	local paddleLocation = coworkerSprite.y - 10
-	calculateSpin(paddleLocation)
+	calculateSpin(paddleLocation, 'coworker')
 	
 	ballSpeed -= 40 * ballSpeedMultiplier
 	ballUpForce += hitUpForce
@@ -190,7 +210,7 @@ end
 
 local function hit(paddleLocation)
 	playHitSound()
-	calculateSpin(paddleLocation)
+	calculateSpin(paddleLocation, 'player')
 	ballUpForce += hitUpForce
 	ballSpeedMultiplier *= 1.001
 	ballLastTouched = "player"
@@ -200,12 +220,15 @@ local function hit(paddleLocation)
 	else 
 		ballSpeed += 40 * ballSpeedMultiplier
 	end
-	
-	gfx.drawLine(0, 0, 100, 100)
 end
 
 local function swing()
 	player:swing()
+	
+	-- swing spin indicator
+	-- gfx.drawLine(player.x+30,player.y-30,player.x + 70, player.y-30)
+	-- gfx.drawLine(player.x+30,player.y+20,player.x + 70, player.y+20)
+	
 	if ballSprite.x < 100 then
 		local paddleLocation = player.y - 10
 		if paddleLocation < ballSprite.y + 30 and paddleLocation > ballSprite.y - 30 and ballLastTouched ~= "player" then
@@ -351,6 +374,8 @@ local function renderUI()
 	-- spin gauge
 	gfx.drawRect(139, 218, 50, 14)
 	gfx.drawRect(210, 218, 50, 14)
+	gfx.drawText(math.floor(ballSpin), 192, 205)
+	
 	if gaugeLevel >= gaugeMax then
 		gfx.drawText("C SMASH!", 300, 100)
 	elseif gaugeLevel <= -gaugeMax then
@@ -361,7 +386,6 @@ local function renderUI()
 	if debug then
 		gfx.drawText("time: " .. seconds .. " BSpeed: " .. ballSpeed .. "  BUpForce: " .. ballUpForce .. "  BBounceHeight: " .. ballBounceHeight, 5, 5)	
 		gfx.drawText("ball.x" .. ballSprite.x .. " ball.y" .. ballSprite.y .. " paddle.y" .. paddleLocation, 5, 30)
-		gfx.drawText("SPIN " .. math.floor(ballSpin), 160, 220)
 	end
 end
 
@@ -369,6 +393,11 @@ function playdate.update()
 	gfx.setFont(font)
 	
 	if gameState == "play" then
+		
+		-- Update screen
+		playdate.timer.updateTimers()
+		gfx.sprite.update()
+		renderUI()
 		
 		-- Controls
 		if playdate.buttonJustPressed(playdate.kButtonA) then
@@ -425,21 +454,13 @@ function playdate.update()
 		-- Time
 		if time % timeSpeed == 0 then
 			moveBall()
-			-- if playdate.buttonIsPressed(playdate.kButtonB) then
-			-- 	--if ballMoving then
-			-- 		windup()
-			-- 	--end
-			-- end
 		end
 		if time % 30 == 0 then
 			seconds += 1
 		end
 		time += 1
 	
-		-- Update screen
-		playdate.timer.updateTimers()
-		gfx.sprite.update()
-		renderUI()
+		
 		
 	elseif gameState == "title" then
 		story:titleScreen()
