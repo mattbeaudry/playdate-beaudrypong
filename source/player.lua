@@ -7,7 +7,6 @@ local gfx <const> = playdate.graphics
 Player = {}
 Player.__index = Player
 
-local playerSprite = nil
 local playerStand = gfx.image.new("images/player-stand-2")
 local playerSwing = gfx.image.new("images/player-swing-2")
 local playerServe = gfx.image.new("images/player-serve-2")
