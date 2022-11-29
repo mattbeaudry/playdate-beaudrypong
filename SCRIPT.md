@@ -10,7 +10,7 @@ The app crashed!
 Customers are losing their data!
 You must get the site back up.
 
-... so finish that game and get back to your desk!
+... so get back to your desk!
 
 
 ## SCRIPT

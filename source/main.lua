@@ -5,6 +5,7 @@ import "CoreLibs/sprites"
 import "CoreLibs/timer"
 import "player"
 import "coworker"
+import "boss"
 import "story"
 import "desk"
 
@@ -16,6 +17,7 @@ local snd <const> = playdate.sound
 
 local player = Player:new()
 local coworker = Coworker:new()
+local boss = Boss:new()
 local story = Story:new()
 local desks = {}
 
@@ -339,7 +341,7 @@ local function drawDesks()
 		{"server", "working"},
 		{"server", "working"},
 	}
-	
+
 	for i = 1, #currentOfficeDesks do
 	  desks[i] = Desk:new()
 	  desks[i]:add()
@@ -349,17 +351,25 @@ local function drawDesks()
 	end
 end
 
+local function drawDialogue(text)
+	gfx.drawRect(50, 50, 200, 80)
+	gfx.drawText(text, 60, 60)
+	
+	-- disable input and game, press A to continue
+end
+
 local function initialize()
 	math.randomseed(playdate.getSecondsSinceEpoch())
 
-	coworkerSprite = gfx.sprite.new()
 	tableSprite = gfx.sprite.new(table)
 	ballSprite = gfx.sprite.new(ball)
 	
 	player:add()
 	coworker:add()
+	boss:add()
 	tableSprite:add()
 	ballSprite:add()
+	
 	drawDesks()
 	
 	resetGame()
@@ -434,75 +444,88 @@ function playdate.update()
 	
 	if gameState == "play" then
 		
-		-- Update screen
-		playdate.timer.updateTimers()
-		gfx.sprite.update()
-		renderUI()
-		
-		-- Controls
-		if playdate.buttonJustPressed(playdate.kButtonA) then
-			if ballMoving then
-				swing()
-			else
-				serve()
+		if showDialog then
+			-- Update screen
+			playdate.timer.updateTimers()
+			gfx.sprite.update()
+			renderUI()
+			
+			drawDialogue("get back to your desk")
+			
+			if playdate.buttonJustPressed(playdate.kButtonA) then
+				showDialog = false
 			end
-		end
-		if playdate.buttonJustPressed(playdate.kButtonB) then
-			if debug then
-				printTable(gfx.sprite.getAllSprites())
-			end
-			if ballMoving then
-				player:smashWindUp()
-			end
-		end
-		if playdate.buttonIsPressed(playdate.kButtonB) then
-			if ballMoving then
-				player:smashWinding()
-			end
-		end
-		if playdate.buttonJustReleased(playdate.kButtonB) then
-			if ballMoving then
-				swing("smash")
-				player:resetPoint()
-			end
-		end
-		if playdate.buttonIsPressed(playdate.kButtonUp) then
-			if player.y > 75 then 
-				player:moveBy(0, -playerSpeed)
-				if playerServing then
-					ballSprite:moveBy(0, -playerSpeed)
+		else
+			-- Update screen
+			playdate.timer.updateTimers()
+			gfx.sprite.update()
+			renderUI()
+			
+			-- Controls
+			if playdate.buttonJustPressed(playdate.kButtonA) then
+				if ballMoving then
+					swing()
+				else
+					serve()
 				end
+			end
+			if playdate.buttonJustPressed(playdate.kButtonB) then
 				if debug then
-					gfx.drawLine(0, player.y, 400, player.y)
+					printTable(gfx.sprite.getAllSprites())
+				end
+				if ballMoving then
+					player:smashWindUp()
 				end
 			end
-		end
-		if playdate.buttonIsPressed(playdate.kButtonDown) then
-			if player.y < 190 then 
-				player:moveBy(0, playerSpeed)
-				if playerServing then
-					ballSprite:moveBy(0, playerSpeed)
-				end
-				if debug then
-					gfx.drawLine(0, player.y, 400, player.y)
+			if playdate.buttonIsPressed(playdate.kButtonB) then
+				if ballMoving then
+					player:smashWinding()
 				end
 			end
+			if playdate.buttonJustReleased(playdate.kButtonB) then
+				if ballMoving then
+					swing("smash")
+					player:resetPoint()
+				end
+			end
+			if playdate.buttonIsPressed(playdate.kButtonUp) then
+				if player.y > 75 then 
+					player:moveBy(0, -playerSpeed)
+					if playerServing then
+						ballSprite:moveBy(0, -playerSpeed)
+					end
+					if debug then
+						gfx.drawLine(0, player.y, 400, player.y)
+					end
+				end
+			end
+			if playdate.buttonIsPressed(playdate.kButtonDown) then
+				if player.y < 190 then 
+					player:moveBy(0, playerSpeed)
+					if playerServing then
+						ballSprite:moveBy(0, playerSpeed)
+					end
+					if debug then
+						gfx.drawLine(0, player.y, 400, player.y)
+					end
+				end
+			end
+			
+			-- Coworker ai
+			if ballMoving then
+				coworker:moveTo(coworker.x, ballSprite.y)
+			end
+			
+			-- Time
+			if time % timeSpeed == 0 then
+				moveBall()
+			end
+			if time % 30 == 0 then
+				seconds += 1
+			end
+			time += 1
 		end
-		
-		-- Coworker ai
-		if ballMoving then
-			coworkerSprite:moveTo(coworkerSprite.x, ballSprite.y)
-		end
-		
-		-- Time
-		if time % timeSpeed == 0 then
-			moveBall()
-		end
-		if time % 30 == 0 then
-			seconds += 1
-		end
-		time += 1
-		
+	
 	elseif gameState == "title" then
 		story:titleScreen()
 		if playdate.buttonJustPressed(playdate.kButtonA) then
@@ -519,6 +542,7 @@ function playdate.update()
 		story:missionScreen()
 		if playdate.buttonJustPressed(playdate.kButtonA) then
 			gameState = "play"
+			showDialog = true
 			initialize()
 		end
 	elseif gameState == "end" then
