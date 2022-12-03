@@ -12,13 +12,22 @@ local playerSwing = gfx.image.new("images/player-swing-2")
 local playerServe = gfx.image.new("images/player-serve-2")
 local playerThrow = gfx.image.new("images/player-throw-2")
 local playerSmash = gfx.image.new("images/player-smash")
+local playerInjured = gfx.image.new("images/player-injured")
 
 local maxSmashPower = 100
 
 function Player:new()
-	
 	local self = gfx.sprite.new(playerStand)
 	self.playerSmashPower = 5
+	self.velocity = 0
+	
+	function self:stance()
+		self:setImage(playerStand, gfx.kImageFlippedX)
+	end
+	
+	function self:injured()
+		self:setImage(playerInjured, gfx.kImageFlippedX)
+	end
 	
 	function self:resetPoint()
 		self.playerSmashPower = 0

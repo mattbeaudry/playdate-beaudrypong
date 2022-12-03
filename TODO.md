@@ -8,14 +8,12 @@
 - coworker serve functionality
 - ball should go into AI or player hand depending on who won last point
 - B button to return a smash
-- POWERSMASH that requires a pause and cinematic animation and requires using the crank to do a smash
-- story for tournament and multiple rounds before gameover
-- office movement:
+- epic move POWERSMASH that requires a pause and cinematic animation and requires using the crank to do a smash
+	- the whole office, desks, employees etc should be swallowed up in the power of the powersmash
+- story for tournament and 3 rounds before gameover
+- office environment movement animation:
 	- server light flash
 	- boss getting up crossing arms from time to time
 	- 2 frame animation for each desk employee+state
 	- player/coworker stance bounce
 - dialog system
-
-# IDEAS
-- the table and players kinda look like a face, i wonder if there is a way to use that
