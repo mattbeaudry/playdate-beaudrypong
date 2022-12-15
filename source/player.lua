@@ -22,11 +22,11 @@ function Player:new()
 	self.velocity = 0
 	
 	function self:stance()
-		self:setImage(playerStand, gfx.kImageFlippedX)
+		self:setImage(playerStand)
 	end
 	
 	function self:injured()
-		self:setImage(playerInjured, gfx.kImageFlippedX)
+		self:setImage(playerInjured)
 	end
 	
 	function self:resetPoint()

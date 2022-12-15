@@ -18,8 +18,9 @@ function Coworker:new()
 	
 	local self = gfx.sprite.new(coworkerStand)
 	self:setImage(coworkerStand, gfx.kImageFlippedX)
-	
 	self.velocity = 0
+	self.hasSwung = false
+	self.hasServed = false
 	
 	function self:stance()
 		self:setImage(coworkerStand, gfx.kImageFlippedX)
@@ -34,6 +35,17 @@ function Coworker:new()
 		playdate.timer.performAfterDelay(100, function()
 			self:setImage(coworkerStand, gfx.kImageFlippedX)
 		end)
+	end
+	
+	function self:throw()
+		self:setImage(coworkerThrow, gfx.kImageFlippedX)
+		playdate.timer.performAfterDelay(300, function()
+			self:setImage(coworkerStand, gfx.kImageFlippedX)
+		end)
+	end
+	
+	function self:serve()
+		self:setImage(coworkerServe, gfx.kImageFlippedX)
 	end
 	
 	return self

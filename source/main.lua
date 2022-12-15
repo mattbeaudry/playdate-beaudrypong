@@ -39,6 +39,7 @@ local tableEdgeTop = 170
 local floorEdge = 220
 local ballSpeed = 0
 local ballMoving = false
+local ballServing = false
 local ballUpForce = 0
 local hitUpForce = 22
 local hitType = "normal"
@@ -48,7 +49,7 @@ local ballSpeedMultiplier = 1
 local ballSpin = 0
 local ballLastTouched = "none"
 local playerSpeed = 5
-local playerServing = false
+local whoIsServing = "none"
 local paddleLocation = 0
 local time = 0
 local timeSpeed = nil
@@ -103,6 +104,7 @@ end
 local function resetPoint()
 	ballSpeed = 0
 	ballMoving = false
+	ballServing = false
 	ballUpForce = 0
 	ballBounceHeight = 0
 	ballBounceMultiplier = 1
@@ -125,45 +127,36 @@ end
 
 local function resetScreen()
 	-- print("reset screen")
-	-- this should only fire once
+	-- todo: this should only fire once
 	gfx.setBackgroundColor(gfx.kColorWhite)
 	gfx.setColor(gfx.kColorWhite)
 	gfx.fillRect(0, 0, 400, 240)
 end
 
 local function calculateSpin(paddleLocation, person)
-	print("*****************")
 	if paddleLocation < ballSprite.y then
 		local addSpin = ballSprite.y - paddleLocation
-		print("ball ABOVE paddle")
-		print("ball Spin="..ballSpin)
 		ballSpin -= addSpin
-		print("MINUS Spin="..addSpin)
-		print("new ball Spin="..ballSpin)
 		
 		-- hit spin indicator
 		if person == 'player' then
 			gfx.drawLine(player.x+30,player.y-30,player.x + 70, player.y-30)
-			gfx.drawText("SPIN -", player.x+30, player.y+35)
+			--gfx.drawText("SPIN -", player.x+30, player.y+35)
 		elseif person == 'coworker' then
-			gfx.drawLine(coworker.x-30,coworker.y-30,coworker.x-70, coworker.y-30)
+			--gfx.drawLine(coworker.x-30,coworker.y-30,coworker.x-70, coworker.y-30)
 			gfx.drawText("SPIN -", coworker.x-30, coworker.y+35)
 		end
 	elseif paddleLocation > ballSprite.y then
 		local addSpin = paddleLocation - ballSprite.y
-		print("ball BELOW paddle")
-		print("ball Spin="..ballSpin)
 		ballSpin += addSpin
-		print("ADD Spin="..addSpin)
-		print("new ball Spin="..ballSpin)
 		
 		-- hit spin indicator
 		if person == 'player' then
-			gfx.drawLine(coworker.x-30,coworker.y-30,coworker.x-70, coworker.y-30)
+			--gfx.drawLine(player.x-30,player.y-30,player.x-70, player.y-30)
 			gfx.drawText("SPIN +", player.x+30, player.y-45)
 		elseif person == 'coworker' then
 			gfx.drawText("SPIN +", coworker.x-30, coworker.y-45)
-			gfx.drawLine(coworker.x-30,coworker.y+20,coworker.x-70, coworker.y+20)
+			--gfx.drawLine(coworker.x-30,coworker.y+20,coworker.x-70, coworker.y+20)
 		end
 	else
 		--print("**** PERFECT ACCURACY SHOT -- Do something special? ****")
@@ -180,6 +173,8 @@ local function playHitSound()
 end
 
 local function coworkerHits()
+	ballMoving = true
+	ballServing = false
 	playHitSound()
 	
 	-- simulate swing accuracy, random strength and top or bottom spin
@@ -194,7 +189,12 @@ local function coworkerHits()
 	local paddleLocation = coworker.y + offset
 	calculateSpin(paddleLocation, 'coworker')
 	
-	ballSpeed -= 40 * ballSpeedMultiplier
+	if ballSpeed == 0 then
+		ballSpeed -= 20 * ballSpeedMultiplier
+	else 
+		ballSpeed -= 40 * ballSpeedMultiplier
+	end
+	
 	ballUpForce += hitUpForce
 	ballBounceMultiplier = 1
 	ballSpeedMultiplier *= 1.001
@@ -203,8 +203,8 @@ local function coworkerHits()
 end
 
 local function coworkerSwings()
-	gfx.drawLine(coworker.x-30, coworker.y-30, coworker.x-70, coworker.y-30)
-	gfx.drawLine(coworker.x-30, coworker.y+20, coworker.x-70, coworker.y+20)
+	-- gfx.drawLine(coworker.x-30, coworker.y-30, coworker.x-70, coworker.y-30)
+	-- gfx.drawLine(coworker.x-30, coworker.y+20, coworker.x-70, coworker.y+20)
 
 	coworker:swing()
 	math.randomseed(playdate.getSecondsSinceEpoch())
@@ -223,29 +223,41 @@ local function coworkerSwings()
 end
 
 local function serve()
-	if playerServing == true then
+	if whoIsServing == 'none' then
+		print("player ready to serve")
+		ballSprite:moveTo(player.x + 38, player.y - 20)
+		player:serve()
+		whoIsServing = "player"
+	else
+		print("throw to serve")
+		ballServing = true
 		local throwBall = ballSprite.y - 30
-		ballSprite:moveTo(98, throwBall)
+		
+		if whoIsServing == 'player' then
+			ballSprite:moveTo(98, throwBall)
+			player:throw()
+		elseif whoIsServing == 'coworker' then
+			ballSprite:moveTo(300, throwBall)
+			coworker:throw()
+		end
+		
 		ballUpForce += 15
 		ballSpeed = 0
 		ballMoving = true
-		playerServing = false
-		player:throw()
-	else
-		ballSprite:moveTo(player.x + 38, player.y - 20)
-		player:serve()
-		playerServing = true
+		whoIsServing = "none"
 	end
 end
 
 local function hit(paddleLocation)
+	ballMoving = true
+	ballServing = false
 	playHitSound()
 	calculateSpin(paddleLocation, 'player')
 	ballUpForce += hitUpForce
 	ballSpeedMultiplier *= 1.001
 	ballLastTouched = "player"
 	hitType = "normal"
-
+	
 	if ballSpeed == 0 then
 		ballSpeed += 20
 	else 
@@ -263,9 +275,9 @@ local function hitSmash()
 end
 
 local function swing(type)
-	gfx.drawLine(player.x+30,player.y-30,player.x + 70, player.y-30)
-	gfx.drawLine(player.x+30,player.y+20,player.x + 70, player.y+20)
-	
+	--gfx.drawLine(player.x+30,player.y-30,player.x + 70, player.y-30)
+	--gfx.drawLine(player.x+30,player.y+20,player.x + 70, player.y+20)
+	print("SWING")
 	player:swing()
 	if ballSprite.x < 100 then
 		local paddleLocation = player.y - 10
@@ -281,6 +293,13 @@ end
 
 local function updateScore(who, howMuch)
 	score[who] += howMuch
+	
+	if who == 2 then
+		whoIsServing = 'coworker'
+	elseif who == 1 then
+		whoIsServing = 'none'
+	end
+	
 	if score[who] == maxScore then
 		gameState = "end"
 	end
@@ -293,7 +312,7 @@ local function injurePlayer(player)
 end
 
 local function moveBall()
-	if ballMoving then
+	if ballMoving or ballServing then
 		if ballSprite.x > tableEdgeLeft and ballSprite.x < tableEdgeRight then
 			if ballSprite.y > tableEdgeTop and ballLastTouched ~= "table" then
 				-- ball hits table
@@ -317,7 +336,14 @@ local function moveBall()
 						resetSprites()
 					end)
 				else
-					coworkerSwings()
+					if coworker.hasSwung == false then
+						print("coworker has swung")
+						coworkerSwings()
+						coworker.hasSwung = true
+						playdate.timer.performAfterDelay(1000, function()
+							coworker.hasSwung = false
+						end)
+					end
 				end
 			elseif ballSprite.x < 75 then
 				--ball hits player
@@ -342,17 +368,16 @@ local function moveBall()
 		-- ball off the screen
 		if ballSprite.x > 400 or ballSprite.x < 0 or ballSprite.y > 240 then
 			if ballLastTouched == "player" then
-				--print("player touched last, coworker +1 point")
+				-- player touched last, coworker +1 point
 				updateScore(2, 1)
 			elseif ballLastTouched == "coworker" then
-				--print("coworker touched last, player +1 point")
+				-- coworker touched last, player +1 point
 				updateScore(1, 1)
 			elseif ballLastTouched == ("table" or "none") then
 				if ballSprite.x < 200 then
-					--print("last touched none/table, LEFT side of screen, coworker +1 point")
 					updateScore(2, 1)
 				else
-					--print("last touched none/table, RIGHT side of screen, coworker +1 point")
+					-- last touched none/table, RIGHT side of screen, coworker +1 point
 					updateScore(1, 1)
 				end
 			end
@@ -374,9 +399,9 @@ end
 local function drawDesks()
 	local currentOfficeDesks = {
 		{"coworker", "working"},
-		{"coworker", "afk"},
+		{"coworker", "working"},
 		{"developer", "working"},
-		{"developer", "afk"},
+		{"developer", "working"},
 		{"boss", "working"},
 		{"server", "working"},
 		{"server", "working"},
@@ -414,7 +439,6 @@ local function initialize()
 	resetPoint()
 	resetSprites()
 	resetTimer()
-	
 	
 	gfx.sprite.setBackgroundDrawingCallback(
 		function(x, y, width, height)
@@ -461,7 +485,6 @@ local function renderUI()
 	renderSpinMeter()
 	gfx.drawRect(149, 218, 40, 14)
 	gfx.drawRect(210, 218, 40, 14)
-	gfx.drawText(math.floor(ballSpin), 192, 205)
 
 	-- SMASH available indicator
 	if blink.on then
@@ -474,6 +497,7 @@ local function renderUI()
 
 	-- debug info
 	if debug then
+		gfx.drawText(math.floor(ballSpin), 192, 205)
 		gfx.drawText("time: " .. seconds .. " BSpeed: " .. ballSpeed .. "  BUpForce: " .. ballUpForce .. "  BBounceHeight: " .. ballBounceHeight, 5, 5)	
 		gfx.drawText("ball.x" .. ballSprite.x .. " ball.y" .. ballSprite.y .. " paddle.y" .. paddleLocation, 5, 30)
 		playdate.drawFPS(100, 100)
@@ -505,21 +529,17 @@ function playdate.update()
 			end
 		else
 			
-			-- game round settings
-			-- if round == 1 then
-			-- 	
-			-- 	
-			
-			moveEmployee("coworker")
-			
-			-- Controls
+			-- A just pressed
 			if playdate.buttonJustPressed(playdate.kButtonA) then
+				
 				if ballMoving then
 					swing()
-				else
+				elseif whoIsServing == 'player' or 'none' then
 					serve()
 				end
 			end
+			
+			-- B just pressed
 			if playdate.buttonJustPressed(playdate.kButtonB) then
 				if debug then
 					printTable(gfx.sprite.getAllSprites())
@@ -528,21 +548,27 @@ function playdate.update()
 					player:smashWindUp()
 				end
 			end
+			
+			-- B IS pressed
 			if playdate.buttonIsPressed(playdate.kButtonB) then
 				if ballMoving then
 					player:smashWinding()
 				end
 			end
+			
+			-- B just pressed
 			if playdate.buttonJustReleased(playdate.kButtonB) then
 				if ballMoving then
 					swing("smash")
 					player:resetPoint()
 				end
 			end
+			
+			-- UP is pressed
 			if playdate.buttonIsPressed(playdate.kButtonUp) then
 				if player.y > 50 then 
 					player:moveBy(0, -playerSpeed)
-					if playerServing then
+					if whoIsServing == "player" then
 						ballSprite:moveBy(0, -playerSpeed)
 					end
 					if debug then
@@ -550,10 +576,12 @@ function playdate.update()
 					end
 				end
 			end
+			
+			-- DOWN is pressed
 			if playdate.buttonIsPressed(playdate.kButtonDown) then
 				if player.y < 190 then 
 					player:moveBy(0, playerSpeed)
-					if playerServing then
+					if whoIsServing == "player" then
 						ballSprite:moveBy(0, playerSpeed)
 					end
 					if debug then
@@ -562,8 +590,12 @@ function playdate.update()
 				end
 			end
 			
-			-- Coworker ai
-			if ballMoving then
+			-- game round settings
+			-- if round == 1 then
+
+			-- Coworker ai	
+			if ballMoving and not ballServing then
+				--moveEmployee("coworker")
 				if ballSprite.y > 50 or ballSprite.y < 150 then
 					coworker:moveTo(coworker.x, ballSprite.y)
 				end
@@ -572,6 +604,25 @@ function playdate.update()
 			-- Time
 			if time % timeSpeed == 0 then
 				moveBall()
+				
+				if whoIsServing == 'coworker' then
+					-- move coworker up and down and then throw for a serve
+					if coworker.hasServed == false then
+						coworker.hasServed = true
+						coworker:serve()
+						ballSprite:moveTo(312, coworker.y - 20)
+						
+						playdate.timer.performAfterDelay(1000, function()
+							coworker.hasServed = false
+						end)
+						playdate.timer.performAfterDelay(1000, function()
+							serve()
+						end)
+						playdate.timer.performAfterDelay(1500, function()
+							coworkerSwings()
+						end)
+					end
+				end
 			end
 			if time % 30 == 0 then
 				seconds += 1
