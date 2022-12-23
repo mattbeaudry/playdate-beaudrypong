@@ -55,6 +55,7 @@ local time = 0
 local timeSpeed = nil
 local seconds = 0
 local score = {0, 0}
+local scoreUpdated = false
 local maxScore = 3
 local gravity = 20
 local showMessage = false
@@ -292,6 +293,8 @@ local function swing(type)
 end
 
 local function updateScore(who, howMuch)
+	print("update score")
+	
 	score[who] += howMuch
 	
 	if who == 2 then
@@ -331,9 +334,15 @@ local function moveBall()
 					injurePlayer("coworker")
 					showMessage = true
 					playdate.timer.performAfterDelay(1000, function()
-						updateScore(1,1)
-						resetPoint()
-						resetSprites()
+						if scoreUpdated == false then
+							updateScore(1,1)
+							resetPoint()
+							resetSprites()
+						end
+						scoreUpdated = true
+						playdate.timer.performAfterDelay(1000, function()
+							scoreUpdated = false
+						end)
 					end)
 				else
 					if coworker.hasSwung == false then

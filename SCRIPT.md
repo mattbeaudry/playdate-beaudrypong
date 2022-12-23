@@ -1,7 +1,7 @@
 # Shitty Ping Pong script
 
-Welcome to shitty ping pong
-You work at shitty Corp
+Welcome to Shitty Ping Pong
+You work at Shitty Corp
 
 You are the lead coder of Shitter,
 the worlds shittiest social network
@@ -15,9 +15,14 @@ You must get the site back up.
 
 ## SCRIPT
 
+ROUND 1 - versus coworker
+
 *Boss:* If you don’t get back to your desk and fix the site HR is going to take away your gourmet breakfasts!
 *Player:* Those danishes are shit, and we only have a couple more games
 
+ROUND 2 - verses developer
+
+ROUND 3 - versus 
 
 ## PLAYER LINES
 
@@ -32,7 +37,7 @@ You must get the site back up.
 *Boss:* Get back to your desk, NOW
 *Boss:* Our SEO is getting shittier by the minute, head of marketing just stormed out.
 *Boss:* Okay fix this shit now all our servers are down
-*Boss:* We are being sued, what is taking so long?
+*Boss:* We are being sued, what the shit is taking so long?
 *Boss:* The servers are on fire!
 *Boss:* Elon is going to fire you!
 *Boss:* We've been hacked!

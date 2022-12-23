@@ -1,11 +1,14 @@
 local gfx <const> = playdate.graphics
 
+local splashScreenCard = gfx.image.new("card.png")
+
 Story = {}
 Story.__index = Story
 
 function Story:new()
 	function self:titleScreen()
 		gfx.drawText("SHITTY PING PONG", 130, 30)
+		splashScreenCard:draw(30, 20)
 		
 		gfx.drawText("PRESS A", 330, 210)
 	end
@@ -42,7 +45,7 @@ function Story:new()
 	end
 	
 	function self:endScreen(score, maxScore)
-		print(score[1].." "..score[2])
+		-- print(score[1].." "..score[2])
 		
 		if score[1] >= maxScore then
 			gfx.drawText("Congratulations, you won the tournament!", 30, 75)
