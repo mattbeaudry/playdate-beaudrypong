@@ -8,9 +8,11 @@ import "player"
 import "coworker"
 import "boss"
 import "story"
-import "desk"
+import "desks"
+import "round"
 
 local debug = false
+local gameState = "title"
 
 local gfx <const> = playdate.graphics
 local font = gfx.font.new('font/Nano Sans 2X/Nano Sans 2X')
@@ -21,7 +23,8 @@ local player = Player:new()
 local coworker = Coworker:new()
 local boss = Boss:new()
 local story = Story:new()
-local desks = {}
+local desks = Desks:new()
+local round = Round:new()
 
 local ball = gfx.image.new("images/ball-outline")
 local table = gfx.image.new("images/table")
@@ -29,9 +32,6 @@ local tableSprite = gfx.sprite.new(table)
 local ballSprite = gfx.sprite.new(ball)
 local line = nil
 local backgroundOffice = gfx.image.new("images/background-walls")
-
-local gameState = "title"
-local round = 1
 
 local tableEdgeLeft = 100
 local tableEdgeRight = 300
@@ -54,7 +54,12 @@ local paddleLocation = 0
 local time = 0
 local timeSpeed = nil
 local seconds = 0
-local score = {0, 0}
+local score = {
+	{0, 0},
+	{0, 0},
+	{0, 0},
+	{0, 0},
+}
 local scoreUpdated = false
 local maxScore = 3
 local gravity = 20
@@ -123,7 +128,8 @@ local function resetGame()
 	player:resetGame()
 	time = 0
 	seconds = 0
-	score = {0, 0}
+	-- score = {0, 0}
+	whoIsServing = 'none'
 end
 
 local function resetScreen()
@@ -211,9 +217,20 @@ local function coworkerSwings()
 	math.randomseed(playdate.getSecondsSinceEpoch())
 	local r = math.random(1, 20)
 	if r == 1 then
-		score[1] += 1
-		if score[1] == maxScore then
-			gameState = "end"
+		score[round.round][1] += 1
+		if score[round.round][1] == maxScore then 
+			if round.round == 4 then
+				gameState = "end"
+			else
+				-- next round
+				round:nextRound()
+				coworker.employee = round.opponent
+				coworker:stance()
+				boss:add()
+				resetPoint()
+				resetGame()
+				showDialog = true
+			end
 		end
 		showMessage = true
 		resetPoint()
@@ -295,7 +312,7 @@ end
 local function updateScore(who, howMuch)
 	print("update score")
 	
-	score[who] += howMuch
+	score[round.round][who] += howMuch
 	
 	if who == 2 then
 		whoIsServing = 'coworker'
@@ -303,8 +320,20 @@ local function updateScore(who, howMuch)
 		whoIsServing = 'none'
 	end
 	
-	if score[who] == maxScore then
-		gameState = "end"
+	if score[round.round][who] == maxScore then
+		if round.round == 4 then
+			gameState = "end"
+		else
+			-- next round
+			round:nextRound()
+			coworker.employee = round.opponent
+			coworker:stance()
+			boss:add()
+			resetPoint()
+			resetGame()
+			showDialog = true
+			-- initialize()
+		end
 	end
 end
 
@@ -405,26 +434,6 @@ local function moveBall()
 	end
 end
 
-local function drawDesks()
-	local currentOfficeDesks = {
-		{"coworker", "working"},
-		{"coworker", "working"},
-		{"developer", "working"},
-		{"developer", "working"},
-		{"boss", "working"},
-		{"server", "working"},
-		{"server", "working"},
-	}
-
-	for i = 1, #currentOfficeDesks do
-	  desks[i] = Desk:new()
-	  desks[i]:add()
-	  desks[i]:updateEmployee(currentOfficeDesks[i][1])
-	  desks[i]:updateState(currentOfficeDesks[i][2])
-	  desks[i]:moveTo(40+(i*40), 35)
-	end
-end
-
 local function drawDialogue(text)
 	gfx.drawRect(50, 60, 200, 60)
 	gfx.drawText(text, 60, 70)
@@ -438,12 +447,10 @@ local function initialize()
 	
 	player:add()
 	coworker:add()
-	boss:add()
 	tableSprite:add()
 	ballSprite:add()
 	
-	drawDesks()
-	
+	desks:drawDesks()
 	resetGame()
 	resetPoint()
 	resetSprites()
@@ -464,7 +471,7 @@ local function initialize()
 			
 			gfx.clearClipRect()
 		end
-	)
+	) 
 end
 
 local function renderUI()
@@ -474,8 +481,10 @@ local function renderUI()
 	end
 
 	-- scoreboard
-	gfx.drawText(score[1], 55, 220)
-	gfx.drawText(score[2], 340, 220)
+	gfx.drawText(score[round.round][1], 55, 220)
+	gfx.drawText(score[round.round][2], 340, 220)
+	
+	gfx.drawText("ROUND: "..round.round, 180, 205)
 	
 	-- point indicator
 	if showMessage then
@@ -530,18 +539,30 @@ function playdate.update()
 		renderUI()
 		
 		if showDialog then
-			drawDialogue("get back to your desk")
+			drawDialogue(round.dialog[1])
 			
 			if playdate.buttonJustPressed(playdate.kButtonA) then
 				showDialog = false
 				boss:remove()
+				
+				if round.round == 1 then
+					desks:firstRound()
+				elseif round.round == 2 then
+					desks:secondRound()
+				elseif round.round == 3 then
+					desks:thirdRound()
+				elseif round.round == 4 then
+					desks:fourthRound()
+				end
+				
+				desks:drawDesks()
 			end
 		else
 			
 			-- A just pressed
 			if playdate.buttonJustPressed(playdate.kButtonA) then
 				
-				if ballMoving then
+				if ballMoving and whoIsServing ~= 'coworker' then
 					swing()
 				elseif whoIsServing == 'player' or 'none' then
 					serve()
@@ -550,24 +571,21 @@ function playdate.update()
 			
 			-- B just pressed
 			if playdate.buttonJustPressed(playdate.kButtonB) then
-				if debug then
-					printTable(gfx.sprite.getAllSprites())
-				end
-				if ballMoving then
+				if ballMoving and whoIsServing ~= 'coworker' then
 					player:smashWindUp()
 				end
 			end
 			
 			-- B IS pressed
 			if playdate.buttonIsPressed(playdate.kButtonB) then
-				if ballMoving then
+				if ballMoving and whoIsServing ~= 'coworker' then
 					player:smashWinding()
 				end
 			end
 			
 			-- B just pressed
 			if playdate.buttonJustReleased(playdate.kButtonB) then
-				if ballMoving then
+				if ballMoving and whoIsServing ~= 'coworker' then
 					swing("smash")
 					player:resetPoint()
 				end
@@ -657,6 +675,13 @@ function playdate.update()
 			gameState = "play"
 			showDialog = true
 			initialize()
+			boss:add()
+			
+			-- start round 1
+			round:firstRound()
+			coworker.employee = round.opponent
+			coworker:stance()
+			-- todo: set game speed
 		end
 	elseif gameState == "end" then
 		gfx.sprite.removeAll()

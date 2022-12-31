@@ -7,13 +7,13 @@ local gfx <const> = playdate.graphics
 Desk = {}
 Desk.__index = Desk
 
-local EMPLOYEES = { "coworker", "developer", "server", "boss" }
+local DESKS = { "coworker", "developer", "server", "boss" }
 local STATES = { "working", "afk", "trashed" }
 local deskImages = {}
 
-for i = 1, #EMPLOYEES do
+for i = 1, #DESKS do
 	for j = 1, #STATES do 
-		local fileName = "desk-"..EMPLOYEES[i].."-"..STATES[j]
+		local fileName = "desk-"..DESKS[i].."-"..STATES[j]
 		deskImages[fileName] = gfx.image.new("images/"..fileName)
 	end
 end

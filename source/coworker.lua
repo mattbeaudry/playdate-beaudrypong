@@ -7,45 +7,50 @@ local gfx <const> = playdate.graphics
 Coworker = {}
 Coworker.__index = Coworker
 
-local coworkerStand = gfx.image.new("images/coworker-stand")
-local coworkerSwing = gfx.image.new("images/coworker-swing")
-local coworkerServe = gfx.image.new("images/coworker-serve")
-local coworkerThrow = gfx.image.new("images/coworker-throw")
-local coworkerSmash = gfx.image.new("images/coworker-smash")
-local coworkerInjured = gfx.image.new("images/coworker-injured")
+local EMPLOYEES = { "coworker", "developer", "designer", "boss" }
+local STATES = { "stand", "stance", "swing", "serve", "throw", "smash", "injured" }
+local employeeImages = {}
+
+for i = 1, #EMPLOYEES do
+	for j = 1, #STATES do 
+		local fileName = EMPLOYEES[i].."-"..STATES[j]
+		employeeImages[fileName] = gfx.image.new("images/"..fileName)
+	end
+end
 
 function Coworker:new()
 	
-	local self = gfx.sprite.new(coworkerStand)
-	self:setImage(coworkerStand, gfx.kImageFlippedX)
+	local self = gfx.sprite.new()
+	self.employee = "coworker"
+	self:setImage(employeeImages[self.employee.."-stance"], gfx.kImageFlippedX)
 	self.velocity = 0
 	self.hasSwung = false
 	self.hasServed = false
 	
 	function self:stance()
-		self:setImage(coworkerStand, gfx.kImageFlippedX)
+		self:setImage(employeeImages[self.employee.."-stance"], gfx.kImageFlippedX)
 	end
 	
 	function self:injured()
-		self:setImage(coworkerInjured, gfx.kImageFlippedX)
+		self:setImage(employeeImages[self.employee.."-injured"], gfx.kImageFlippedX)
 	end
 	
 	function self:swing()
-		self:setImage(coworkerSwing, gfx.kImageFlippedX)
+		self:setImage(employeeImages[self.employee.."-swing"], gfx.kImageFlippedX)
 		playdate.timer.performAfterDelay(100, function()
-			self:setImage(coworkerStand, gfx.kImageFlippedX)
+			self:setImage(employeeImages[self.employee.."-stance"], gfx.kImageFlippedX)
 		end)
 	end
 	
 	function self:throw()
-		self:setImage(coworkerThrow, gfx.kImageFlippedX)
+		self:setImage(employeeImages[self.employee.."-throw"], gfx.kImageFlippedX)
 		playdate.timer.performAfterDelay(300, function()
-			self:setImage(coworkerStand, gfx.kImageFlippedX)
+			self:setImage(employeeImages[self.employee.."-stance"], gfx.kImageFlippedX)
 		end)
 	end
 	
 	function self:serve()
-		self:setImage(coworkerServe, gfx.kImageFlippedX)
+		self:setImage(employeeImages[self.employee.."-serve"], gfx.kImageFlippedX)
 	end
 	
 	return self

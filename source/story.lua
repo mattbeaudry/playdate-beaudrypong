@@ -45,22 +45,23 @@ function Story:new()
 	end
 	
 	function self:endScreen(score, maxScore)
-		-- print(score[1].." "..score[2])
 		
-		if score[1] >= maxScore then
+		if score[4][1] >= maxScore then
 			gfx.drawText("Congratulations, you won the tournament!", 30, 75)
 			gfx.drawText("The company burns to the ground", 30, 90)
 			gfx.drawText("and you lose your job.", 30, 105)
 			gfx.drawText("YOU WIN", 30, 135)
-		elseif score[2] >= maxScore then
+		elseif score[4][2] >= maxScore then
 			gfx.drawText("Finally you go back to your desk", 30, 75)
 			gfx.drawText("and easily get the site back up,", 30, 90)
 			gfx.drawText("the company is saved!", 30, 105)
 			gfx.drawText("GAME OVER", 30, 125)
 		end
 		
-		gfx.drawText("You: " .. score[1], 30, 190)
-		gfx.drawText("Coworker: " .. score[2], 30, 205)
+		gfx.drawText("ROUND 1:  Player-" .. score[1][1] .. "  " ..  .. "-" .. score[1][2], 30, 160)
+		gfx.drawText("ROUND 2:  Player-" .. score[2][1] .. "  C-" .. score[2][2], 30, 175)
+		gfx.drawText("ROUND 3:  Player-" .. score[3][1] .. "  C-" .. score[3][2], 30, 190)
+		gfx.drawText("ROUND 4:  Player-" .. score[4][1] .. "  C-" .. score[4][2], 30, 205)
 		
 		gfx.drawText("PRESS A", 330, 210)
 	end

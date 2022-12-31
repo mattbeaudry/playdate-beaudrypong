@@ -7,22 +7,22 @@ local gfx <const> = playdate.graphics
 Player = {}
 Player.__index = Player
 
-local playerStand = gfx.image.new("images/player-stand-2")
-local playerSwing = gfx.image.new("images/player-swing-2")
-local playerServe = gfx.image.new("images/player-serve-2")
-local playerThrow = gfx.image.new("images/player-throw-2")
+local playerStance = gfx.image.new("images/player-stance")
+local playerSwing = gfx.image.new("images/player-swing")
+local playerServe = gfx.image.new("images/player-serve")
+local playerThrow = gfx.image.new("images/player-throw")
 local playerSmash = gfx.image.new("images/player-smash")
 local playerInjured = gfx.image.new("images/player-injured")
 
 local maxSmashPower = 100
 
 function Player:new()
-	local self = gfx.sprite.new(playerStand)
+	local self = gfx.sprite.new(playerStance)
 	self.playerSmashPower = 5
 	self.velocity = 0
 	
 	function self:stance()
-		self:setImage(playerStand)
+		self:setImage(playerStance)
 	end
 	
 	function self:injured()
@@ -40,7 +40,7 @@ function Player:new()
 	function self:throw()
 		self:setImage(playerThrow)
 		playdate.timer.performAfterDelay(300, function()
-			self:setImage(playerStand)
+			self:setImage(playerStance)
 		end)
 	end
 	
@@ -51,7 +51,7 @@ function Player:new()
 	function self:swing()
 		self:setImage(playerSwing)
 		playdate.timer.performAfterDelay(100, function()
-			self:setImage(playerStand)
+			self:setImage(playerStance)
 		end)
 	end
 	
