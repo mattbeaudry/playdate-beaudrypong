@@ -58,7 +58,7 @@ function Story:new()
 			gfx.drawText("GAME OVER", 30, 125)
 		end
 		
-		gfx.drawText("ROUND 1:  Player-" .. score[1][1] .. "  " ..  .. "-" .. score[1][2], 30, 160)
+		gfx.drawText("ROUND 1:  Player-" .. score[1][1] .. "  C-" .. score[1][2], 30, 160)
 		gfx.drawText("ROUND 2:  Player-" .. score[2][1] .. "  C-" .. score[2][2], 30, 175)
 		gfx.drawText("ROUND 3:  Player-" .. score[3][1] .. "  C-" .. score[3][2], 30, 190)
 		gfx.drawText("ROUND 4:  Player-" .. score[4][1] .. "  C-" .. score[4][2], 30, 205)
