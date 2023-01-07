@@ -3,7 +3,6 @@
 	- player swinging messes up coworker while serving
 	- only can smash when gauge full
 	- end screen score fix
-	- coworker graphics alignment when swinging etc.
 	- coworker not flying off screen when hit with smash
 	- speed is faster per round
 - make the spin logic make more sense, instead of above and below, how about closer to middle more sprint toward other player
@@ -41,6 +40,8 @@
 	- game timespeed
 	- opponent: [player, boss, coworker, designer, pm]
 	- skill level of coworker AI
+- bug fixes
+	- coworker graphics alignment when swinging etc.
 
 # IDEAS
 - what if boss doesn't have a paddle and just hits the ball with his hand

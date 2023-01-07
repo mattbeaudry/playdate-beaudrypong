@@ -561,31 +561,36 @@ function playdate.update()
 			
 			-- A just pressed
 			if playdate.buttonJustPressed(playdate.kButtonA) then
-				
-				if ballMoving and whoIsServing ~= 'coworker' then
+				print('')
+				print('PRESS A')
+				print('whoIsServing: '..whoIsServing)
+				print(ballMoving)
+				if ballMoving then
+					print('swing()')
 					swing()
-				elseif whoIsServing == 'player' or 'none' then
+				elseif whoIsServing == 'player' or whoIsServing == 'none' then
+					print('serve()')
 					serve()
 				end
 			end
 			
 			-- B just pressed
 			if playdate.buttonJustPressed(playdate.kButtonB) then
-				if ballMoving and whoIsServing ~= 'coworker' then
+				if ballMoving then
 					player:smashWindUp()
 				end
 			end
 			
 			-- B IS pressed
 			if playdate.buttonIsPressed(playdate.kButtonB) then
-				if ballMoving and whoIsServing ~= 'coworker' then
+				if ballMoving then
 					player:smashWinding()
 				end
 			end
 			
 			-- B just pressed
 			if playdate.buttonJustReleased(playdate.kButtonB) then
-				if ballMoving and whoIsServing ~= 'coworker' then
+				if ballMoving then
 					swing("smash")
 					player:resetPoint()
 				end
