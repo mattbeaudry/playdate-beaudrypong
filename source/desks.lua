@@ -9,7 +9,6 @@ Desks = {}
 Desks.__index = Desks
 
 function Desks:new()
-	self.deskSprites = {}
 	self.currentDesks = {
 		{"coworker", "working"},
 		{"coworker", "working"},
@@ -19,6 +18,12 @@ function Desks:new()
 		{"server", "working"},
 		{"server", "working"},
 	}
+	
+	self.deskSprites = {}
+	
+	for i = 1, #self.currentDesks do
+	  self.deskSprites[i] = Desk:new()
+	end
 	
 	function self:firstRound()
 		self.currentDesks = {
@@ -68,9 +73,19 @@ function Desks:new()
 		}
 	end
 	
-	function self:drawDesks()
+	function self:clearDesks()
+		print("CLEAR DESKS")
 		for i = 1, #self.currentDesks do
-		  self.deskSprites[i] = Desk:new()
+			self.deskSprites[i]:remove()
+			-- gfx.sprite:updateSprite(self.deskSprites[i])
+		end
+		gfx.sprite.update()
+	end
+	
+	function self:drawDesks()
+		self:clearDesks()
+		print("DRAW DESKS")
+		for i = 1, #self.currentDesks do
 		  self.deskSprites[i]:add()
 		  self.deskSprites[i]:updateEmployee(self.currentDesks[i][1])
 		  self.deskSprites[i]:updateState(self.currentDesks[i][2])

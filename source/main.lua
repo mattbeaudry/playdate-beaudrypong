@@ -52,7 +52,7 @@ local playerSpeed = 5
 local whoIsServing = "none"
 local paddleLocation = 0
 local time = 0
-local timeSpeed = nil
+local timeSpeed = 4
 local seconds = 0
 local score = {
 	{0, 0},
@@ -118,7 +118,6 @@ local function resetPoint()
 	ballSpin = 0
 	ballLastTouched = "none"
 	gaugeLevel = 0
-	timeSpeed = 4
 	coworker.velocityX = 0
 	player:resetPoint()
 	updateSpinMeter()
@@ -223,6 +222,7 @@ local function coworkerSwings()
 				gameState = "end"
 			else
 				-- next round
+				desks:drawDesks()
 				round:nextRound()
 				coworker.employee = round.opponent
 				coworker:stance()
@@ -325,14 +325,15 @@ local function updateScore(who, howMuch)
 			gameState = "end"
 		else
 			-- next round
+			desks:drawDesks()
 			round:nextRound()
+			timeSpeed = round.timeSpeed
 			coworker.employee = round.opponent
 			coworker:stance()
 			boss:add()
 			resetPoint()
 			resetGame()
 			showDialog = true
-			-- initialize()
 		end
 	end
 end
@@ -650,7 +651,11 @@ function playdate.update()
 						playdate.timer.performAfterDelay(1000, function()
 							serve()
 						end)
-						playdate.timer.performAfterDelay(1500, function()
+						
+						print("timeSpeed ".. timeSpeed)
+						local swingTiming = 1000 + timeSpeed * 125
+						print("swingTiming ".. swingTiming)
+						playdate.timer.performAfterDelay(swingTiming, function()
 							coworkerSwings()
 						end)
 					end

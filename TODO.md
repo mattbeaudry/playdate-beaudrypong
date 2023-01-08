@@ -1,23 +1,26 @@
 # TODO
-- round of bug fixes
-	- player swinging messes up coworker while serving
-	- only can smash when gauge full
-	- end screen score fix
+
+## TODO ALPHA
+- make the spin logic make more sense, instead of above and below, how about closer to middle more spin toward other player - make player swing indicator be right where paddle is when swinging
+- only can smash when gauge full
+- bug fixes
 	- coworker not flying off screen when hit with smash
-	- speed is faster per round
-- make the spin logic make more sense, instead of above and below, how about closer to middle more sprint toward other player
-- improve smash wind up meter
-- score for each round and score board
+	- game glitches after smash, multiple rounds happen quickly, point doesn't go to player
+	- when player throw a serve but doesn't swing, they should lose a point
+- hi score board
+
+## TODO RELEASE
+- pre round dialog --> support back and forth, multiple pieces of text, back and forth with player, use which ever character you are about to play instead of the boss every time, still see boss at beginning
+- clean up how to and intro screen
+- improve smash wind up meter and make it count for how fast the smash is
 - coworker can smash
-- move more code out of main file
 - office environment movement animation:
 	- server light flash
 	- boss getting up crossing arms from time to time
 	- 2 frame animation for each desk employee+state
 	- player/coworker stance bounce
-- epic move POWERSMASH that requires a pause and cinematic animation and requires using the crank to do a smash
-	- the whole office, desks, employees etc should be swallowed up in the power of the power smash
-	- maybe this is how you win the game
+- move more code out of main file
+- better sound
 
 # DONE
 - player, table, ball and coworker graphics
@@ -40,8 +43,13 @@
 	- game timespeed
 	- opponent: [player, boss, coworker, designer, pm]
 	- skill level of coworker AI
+	- score for each round and score board
+	- speed is faster per round
 - bug fixes
 	- coworker graphics alignment when swinging etc.
+	- player swinging messes up coworker while serving
+	- desk sprite overlay bug
+	- coworker serve swing takes into account round timeSpeed for swing timing
 
 # IDEAS
 - what if boss doesn't have a paddle and just hits the ball with his hand
