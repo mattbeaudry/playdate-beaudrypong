@@ -1,26 +1,31 @@
 # TODO
 
 ## TODO ALPHA
-- make the spin logic make more sense, instead of above and below, how about closer to middle more spin toward other player - make player swing indicator be right where paddle is when swinging
+- miss/poor/good/great/perfect onscreen labels for shot accuracy feedback
 - only can smash when gauge full
 - bug fixes
-	- coworker not flying off screen when hit with smash
-	- game glitches after smash, multiple rounds happen quickly, point doesn't go to player
 	- when player throw a serve but doesn't swing, they should lose a point
 - hi score board
 
 ## TODO RELEASE
-- pre round dialog --> support back and forth, multiple pieces of text, back and forth with player, use which ever character you are about to play instead of the boss every time, still see boss at beginning
+- pre round dialog --> support back and forth, multiple pieces of text, back and forth with player, use which ever character you are about to play instead of the boss every time, still see boss at beginning, bg desks might need a middle state for when the pre round dialog is happening
 - clean up how to and intro screen
 - improve smash wind up meter and make it count for how fast the smash is
-- coworker can smash
+- coworker ai improvement: 
+	- not perfect swing every time
+	- don't follow ball.y perfectly
+	- move up/down before serving
+	- coworker can smash
 - office environment movement animation:
 	- server light flash
 	- boss getting up crossing arms from time to time
 	- 2 frame animation for each desk employee+state
 	- player/coworker stance bounce
 - move more code out of main file
-- better sound
+- better sound and theme music
+- improved desk graphics for server developers
+- improve screens for dialog and how to and intro and hi score
+
 
 # DONE
 - player, table, ball and coworker graphics
@@ -50,6 +55,9 @@
 	- player swinging messes up coworker while serving
 	- desk sprite overlay bug
 	- coworker serve swing takes into account round timeSpeed for swing timing
+	- make the spin logic make more sense, instead of above and below, how about closer to middle more spin toward other player
+	- coworker not flying off screen when hit with smash
+	- game glitches after smash, multiple rounds happen quickly, point doesn't go to player
 
 # IDEAS
 - what if boss doesn't have a paddle and just hits the ball with his hand

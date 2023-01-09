@@ -13,28 +13,28 @@ function Round:new()
 		self.round = 1
 		self.opponent = 'coworker'
 		self.dialog = { "get back to twerk, i mean work", "but we just started the tounament" }
-		self.timeSpeed = 4
+		self.timeSpeed = 5
 	end
 	
 	function self:secondRound()
 		self.round = 2
 		self.opponent = 'developer'
 		self.dialog = { "we've been hacked", "almost done!" }
-		self.timeSpeed = 3
+		self.timeSpeed = 4
 	end
 	
 	function self:thirdRound()
 		self.round = 3
 		self.opponent = 'designer'
 		self.dialog = { "the servers are on fire!", "one more round!" }
-		self.timeSpeed = 2
+		self.timeSpeed = 3
 	end
 	
 	function self:fourthRound()
 		self.round = 4
 		self.opponent = 'boss'
 		self.dialog = { "fine but if i win you fix things", "okie dokie!" }
-		self.timeSpeed = 1
+		self.timeSpeed = 2
 	end
 	
 	function self:setRound()
