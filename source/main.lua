@@ -416,7 +416,7 @@ local function moveBall()
 				updateScore(2,1)
 				showMessage = true
 				resetPoint()
-				resetSprites()
+				resetSprites() 
 			end
 		end
 		
@@ -433,16 +433,15 @@ local function moveBall()
 		
 		-- ball off the screen
 		if ballSprite.x > 400 or ballSprite.x < 0 or ballSprite.y > 240 then
-			print("ball off screen")
-			
 			if hitType ~= 'smash' then
+				
 				if ballLastTouched == "player" then
 					-- player touched last, coworker +1 point
 					updateScore(2, 1)
 				elseif ballLastTouched == "coworker" then
 					-- coworker touched last, player +1 point
 					updateScore(1, 1)
-				elseif ballLastTouched == ("table" or "none") then
+				elseif ballLastTouched == "table" or ballLastTouched == "none" then
 					if ballSprite.x < 200 then
 						updateScore(2, 1)
 					else
@@ -450,8 +449,10 @@ local function moveBall()
 						updateScore(1, 1)
 					end
 				end
+				
 				resetPoint()
 				resetSprites()
+				
 			end
 		end
 		
