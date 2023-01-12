@@ -53,5 +53,10 @@ function Coworker:new()
 		self:setImage(employeeImages[self.employee.."-serve"], gfx.kImageFlippedX)
 	end
 	
+	function self:talk()
+		self:setImage(employeeImages[self.employee.."-stand"], gfx.kImageFlippedX)
+		self:moveTo(300, 95)
+	end
+	
 	return self
 end

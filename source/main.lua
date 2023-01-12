@@ -27,8 +27,7 @@ local desks = Desks:new()
 local round = Round:new()
 
 local ball = gfx.image.new("images/ball-outline")
-local table = gfx.image.new("images/table")
-local tableSprite = gfx.sprite.new(table)
+local tableSprite = gfx.sprite.new(gfx.image.new("images/table"))
 local ballSprite = gfx.sprite.new(ball)
 local line = nil
 local backgroundOffice = gfx.image.new("images/background-walls")
@@ -66,6 +65,7 @@ local gravity = 20
 local showMessage = false
 local gaugeMax = 3
 local gaugeLevel = 0
+local dialogCount = 1
 
 local function resetTimer()
 	playTimer = playdate.timer.new(1000000, 0, 1000000, playdate.easingFunctions.linear)
@@ -175,12 +175,12 @@ local function calculateSpin(paddleLocation, person)
 	-- hit spin indicator
 	if person == 'player' then
 		ballSpin += addSpin
-		gfx.drawLine(player.x-30,player.y-30,player.x-70, player.y-30)
-		gfx.drawText("SPIN +++", player.x+30, player.y-45)
+		-- gfx.drawLine(player.x-30,player.y-30,player.x-70, player.y-30)
+		-- gfx.drawText("SPIN +++", player.x+30, player.y-45)
 	elseif person == 'coworker' then
 		ballSpin -= addSpin
-		gfx.drawText("SPIN ---", coworker.x-30, coworker.y-45)
-		gfx.drawLine(coworker.x-30,coworker.y+20,coworker.x-70, coworker.y+20)
+		-- gfx.drawText("SPIN ---", coworker.x-30, coworker.y-45)
+		-- gfx.drawLine(coworker.x-30,coworker.y+20,coworker.x-70, coworker.y+20)
 	end
 	
 	print("ballSpin: "..ballSpin)
@@ -242,7 +242,7 @@ local function coworkerSwings()
 				round:nextRound()
 				coworker.employee = round.opponent
 				coworker:stance()
-				boss:add()
+				-- boss:add()
 				resetPoint()
 				resetGame()
 				showDialog = true
@@ -326,7 +326,7 @@ local function swing(type)
 end
 
 local function updateScore(who, howMuch)
-	--print("update score")
+	print("update score for ".. who)
 	
 	score[round.round][who] += howMuch
 	
@@ -346,7 +346,7 @@ local function updateScore(who, howMuch)
 			timeSpeed = round.timeSpeed
 			coworker.employee = round.opponent
 			coworker:stance()
-			boss:add()
+			-- boss:add()
 			resetPoint()
 			resetGame()
 			showDialog = true
@@ -433,7 +433,8 @@ local function moveBall()
 		
 		-- ball off the screen
 		if ballSprite.x > 400 or ballSprite.x < 0 or ballSprite.y > 240 then
-			if hitType ~= 'smash' then
+			print("ball off screennnnn")
+			if hitType ~= 'smash' and ballMoving == true then
 				
 				if ballLastTouched == "player" then
 					-- player touched last, coworker +1 point
@@ -468,9 +469,23 @@ local function moveBall()
 end
 
 local function drawDialogue(text)
-	gfx.drawRect(50, 60, 200, 60)
-	gfx.drawText(text, 60, 70)
+	print("")
+	print("length and lines: ")
+	local textLength = string.len(text)
+	print(textLength)
+	local lines = math.ceil(textLength / 20)
+	print(lines)
 	
+	for i = 0, lines do
+		print("print line "..i)
+		local lineText = string.sub(text, 1 + (i * 20), (1 + (i * 20)) + 20)
+		print("line text: "..lineText)
+		gfx.drawText(lineText, 60, 60 + (i * 20))
+	end
+	
+	gfx.drawRect(50, 60, 200, 60)
+	
+	coworker:talk()
 	-- disable input and game, press A to continue
 end
 
@@ -570,25 +585,37 @@ function playdate.update()
 		blink:update()
 		renderUI()
 		
+		-- pre game dialog
 		if showDialog then
-			drawDialogue(round.dialog[1])
+			
+			drawDialogue(round.dialog[dialogCount][2])
 			
 			if playdate.buttonJustPressed(playdate.kButtonA) then
-				showDialog = false
-				boss:remove()
 				
-				if round.round == 1 then
-					desks:firstRound()
-				elseif round.round == 2 then
-					desks:secondRound()
-				elseif round.round == 3 then
-					desks:thirdRound()
-				elseif round.round == 4 then
-					desks:fourthRound()
+				if dialogCount == table.getsize(round.dialog) then
+					showDialog = false
+					
+					if round.round == 1 then
+						desks:firstRound()
+					elseif round.round == 2 then
+						desks:secondRound()
+					elseif round.round == 3 then
+						desks:thirdRound()
+					elseif round.round == 4 then
+						desks:fourthRound()
+					end
+					
+					desks:drawDesks()
+					dialogCount = 1
+					
+					coworker:moveTo(350, 170)
+					coworker:stance()
+				else
+					dialogCount += 1
 				end
-				
-				desks:drawDesks()
 			end
+		
+		-- game play
 		else
 			
 			-- A just pressed
@@ -663,7 +690,9 @@ function playdate.update()
 				moveBall()
 				
 				if whoIsServing == 'coworker' then
+					
 					-- move coworker up and down and then throw for a serve
+						
 					if coworker.hasServed == false then
 						coworker.hasServed = true
 						coworker:serve()
@@ -705,15 +734,14 @@ function playdate.update()
 		story:missionScreen()
 		if playdate.buttonJustPressed(playdate.kButtonA) then
 			gameState = "play"
+			
 			showDialog = true
 			initialize()
-			boss:add()
 			
 			-- start round 1
 			round:firstRound()
 			coworker.employee = round.opponent
 			coworker:stance()
-			-- todo: set game speed
 		end
 	elseif gameState == "end" then
 		gfx.sprite.removeAll()

@@ -7,33 +7,69 @@ function Round:new()
 	self.round = 0
 	self.opponent = 'coworker'
 	self.timeSpeed = 4
-	self.dialog = { "get back to work" }
+	self.dialog = { "" }
 	
 	function self:firstRound()
 		self.round = 1
 		self.opponent = 'coworker'
-		self.dialog = { "get back to twerk, i mean work", "but we just started the tounament" }
+		self.dialog = {
+			{
+				"coworker",
+				"get back to twerk, i mean work",
+			},
+			{
+				"player",
+				"but we just started the tournament",
+			}
+		}
 		self.timeSpeed = 5
 	end
 	
 	function self:secondRound()
 		self.round = 2
 		self.opponent = 'developer'
-		self.dialog = { "we've been hacked", "almost done!" }
+		self.dialog = { 
+			{
+				"developer",
+				"we've been hacked", 
+			},
+			{
+				"player",
+				"almost done!",
+			}
+		}
 		self.timeSpeed = 4
 	end
 	
 	function self:thirdRound()
 		self.round = 3
 		self.opponent = 'designer'
-		self.dialog = { "the servers are on fire!", "one more round!" }
+		self.dialog = { 
+			{
+				"designer",
+				"the servers are on fire!",
+			},
+			{
+				"player",
+				"one more round!"
+			}
+		}
 		self.timeSpeed = 3
 	end
 	
 	function self:fourthRound()
 		self.round = 4
 		self.opponent = 'boss'
-		self.dialog = { "fine but if i win you fix things", "okie dokie!" }
+		self.dialog = {
+			{
+				"boss",
+				"fine but if i win you fix things",
+			},
+			{
+				"player",
+				"okie dokie!" 
+			}
+		}
 		self.timeSpeed = 2
 	end
 	
