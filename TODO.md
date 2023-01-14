@@ -1,16 +1,10 @@
 # TODO
 
 ## TODO ALPHA
-- better dialog system
-	- better box style
-	- move box depending on which character is talking
-	- text wrap
 - game score calc and hi score board, game stats: smashes, how long the rallies were, missed swings, swing accuracy etc.
 - miss/poor/good/great/perfect onscreen labels for shot accuracy feedback
-- clean up how to and intro screen
 - improved desk graphics for server developers - missing trashed sprites
 - bug fixes
-	- sometimes coworker or player server throw goes up too high
 
 ## TODO RELEASE
 - improve smash wind up meter and make it count for how fast the smash is
@@ -21,13 +15,15 @@
 	- coworker can smash
 - office environment movement animation:
 	- server light flash
-	- boss getting up crossing arms from time to time
+	- boss getting up crossing arms from time to time, maybe during a smash windup? 
 	- 2 frame animation for each desk employee+state
 	- player/coworker stance bounce
-- move more code out of main file
 - better sound and theme music
-- bug fixes
+- tutorial or better how to
+- bug fixes / refactoring
 	- only can smash when gauge full
+	- higher serve throw
+	- move more code out of main file
 
 # DONE
 - player, table, ball and coworker graphics
@@ -53,7 +49,10 @@
 	- score for each round and score board
 	- speed is faster per round
 - pre round dialog --> support back and forth, multiple pieces of text, back and forth with player, use which ever character you are about to play instead of the boss every time
-- bug fixes
+- better dialog system
+	- better box style
+	- move box depending on which character is talking
+- bug fixes / refactoring
 	- coworker graphics alignment when swinging etc.
 	- player swinging messes up coworker while serving
 	- desk sprite overlay bug
@@ -62,6 +61,9 @@
 	- coworker not flying off screen when hit with smash
 	- game glitches after smash, multiple rounds happen quickly, point doesn't go to player
 	- when player throw a serve but doesn't swing, they should lose a point
+	- sometimes coworker or player server throw goes up too high
 
 # IDEAS
 - what if boss doesn't have a paddle and just hits the ball with his hand
+- use the crank, maybe a "super smash" that requires it
+- what if crank was the vertical position of the player

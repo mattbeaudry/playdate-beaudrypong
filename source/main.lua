@@ -75,7 +75,7 @@ local function resetSprites()
 	player:moveTo(50, 170)
 	coworker:moveTo(350, 170)
 	tableSprite:moveTo(200, 190)
-	ballSprite:moveTo(420, 300)
+	-- ballSprite:moveTo(420, 300)
 	player:stance()
 	coworker:stance()
 end
@@ -99,18 +99,22 @@ local function renderSpinMeter()
 	
 	if gaugeLevel > 0 then
 		for i=0, gaugeLevel - 1 do
-			local xValue = 212 + (i * 12)
+			local xValue = 207 + (i * 12)
 			gfx.fillRect(xValue, 220, 10, 10)
 		end
 	else
 		for i=0, math.abs(gaugeLevel) - 1 do
-			local xValue = 177 - (i * 12)
+			local xValue = 183 - (i * 12)
 			gfx.fillRect(xValue, 220, 10, 10)
 		end
 	end
+	
+	gfx.fillRect(195, 220, 10, 10)
+	gfx.drawRect(156, 218, 88, 14)
 end
 
 local function resetPoint()
+	print("RESET POINT")
 	ballSpeed = 0
 	ballMoving = false
 	ballServing = false
@@ -124,13 +128,13 @@ local function resetPoint()
 	coworker.velocityX = 0
 	player:resetPoint()
 	updateSpinMeter()
+	print("ballUpForce"..ballUpForce)
 end
 
 local function resetGame()
 	player:resetGame()
 	time = 0
 	seconds = 0
-	-- score = {0, 0}
 	whoIsServing = 'none'
 end
 
@@ -231,6 +235,7 @@ local function coworkerSwings()
 	coworker:swing()
 	math.randomseed(playdate.getSecondsSinceEpoch())
 	local r = math.random(1, 20)
+	
 	if r == 1 then
 		score[round.round][1] += 1
 		if score[round.round][1] == maxScore then 
@@ -248,6 +253,7 @@ local function coworkerSwings()
 				showDialog = true
 			end
 		end
+		
 		showMessage = true
 		resetPoint()
 		resetSprites()
@@ -274,6 +280,8 @@ local function serve()
 			ballSprite:moveTo(300, throwBall)
 			coworker:throw()
 		end
+		
+		print("ballUpForce"..ballUpForce)
 		
 		ballUpForce += 15
 		ballSpeed = 0
@@ -311,8 +319,8 @@ end
 local function swing(type)
 	gfx.drawLine(player.x+30,player.y-30,player.x + 70, player.y-30)
 	gfx.drawLine(player.x+30,player.y+20,player.x + 70, player.y+20)
-	--print("SWING")
 	player:swing()
+	
 	if ballSprite.x < 100 then
 		local paddleLocation = player.y - 10
 		if paddleLocation < ballSprite.y + 30 and paddleLocation > ballSprite.y - 30 and ballLastTouched ~= "player" then
@@ -364,8 +372,12 @@ end
 local function moveBall()
 	if ballMoving or ballServing then
 		
+		print("ball.x: "..ballSprite.x)
+		print("ball.y: "..ballSprite.y)
+		
 		-- ball hits table
 		if ballSprite.x > tableEdgeLeft and ballSprite.x < tableEdgeRight then
+			print("ball hits table")
 			if ballSprite.y > tableEdgeTop and ballLastTouched ~= "table" then
 				playHitSound()
 				ballUpForce = (ballUpForce + 30) * ballBounceMultiplier
@@ -379,6 +391,7 @@ local function moveBall()
 			
 			--ball hits coworker
 			if ballSprite.x > 300 then
+				print("ball hits coworker")
 				
 				if hitType == "smash" then
 					if scoreUpdated == false then
@@ -402,6 +415,7 @@ local function moveBall()
 					end)
 					
 				else
+					
 					if coworker.hasSwung == false then
 						coworkerSwings()
 						coworker.hasSwung = true
@@ -413,6 +427,7 @@ local function moveBall()
 			
 			--ball hits player
 			elseif ballSprite.x < 75 then
+				
 				updateScore(2,1)
 				showMessage = true
 				resetPoint()
@@ -422,20 +437,27 @@ local function moveBall()
 		
 		-- ball hits floor
 		if ballSprite.y > floorEdge then
+			print("ball hits floor")
+			print("ball.x: "..ballSprite.x)
+			print("ball.y: "..ballSprite.y)
+			
 			ballUpForce = (ballUpForce + 30) * ballBounceMultiplier
 			ballBounceMultiplier *= 0.8
 		end
 		
 		-- ball hits ceiling
 		if ballSprite.y < 0 then
+			print("ball hits ceiling")
 			ballUpForce = (ballUpForce - 30) * ballBounceMultiplier
 		end
 		
 		-- ball off the screen
 		if ballSprite.x > 400 or ballSprite.x < 0 or ballSprite.y > 240 then
 			print("ball off screennnnn")
+			print("ball.x: "..ballSprite.x)
+			print("ball.y: "..ballSprite.y)
+			
 			if hitType ~= 'smash' and ballMoving == true then
-				
 				if ballLastTouched == "player" then
 					-- player touched last, coworker +1 point
 					updateScore(2, 1)
@@ -453,9 +475,10 @@ local function moveBall()
 				
 				resetPoint()
 				resetSprites()
-				
 			end
 		end
+		
+		print("ballUpForce"..ballUpForce)
 		
 		-- move ball
 		local verticalSpeed = gravity - ballUpForce
@@ -468,25 +491,29 @@ local function moveBall()
 	end
 end
 
-local function drawDialogue(text)
-	print("")
-	print("length and lines: ")
+local function drawDialogue(text, employee)
+	local lineLength = 18;
+	local boxWidth = 150;
 	local textLength = string.len(text)
-	print(textLength)
-	local lines = math.ceil(textLength / 20)
-	print(lines)
+	local lines = math.ceil(textLength / lineLength)
+	local xOffset = 0;
+	local yOffset = 0;
 	
-	for i = 0, lines do
-		print("print line "..i)
-		local lineText = string.sub(text, 1 + (i * 20), (1 + (i * 20)) + 20)
-		print("line text: "..lineText)
-		gfx.drawText(lineText, 60, 60 + (i * 20))
+	if employee == 'player' then
+		yOffset = 30
+	else 
+		xOffset = 50
 	end
 	
-	gfx.drawRect(50, 60, 200, 60)
+	for i = 0, lines do
+		local lineText = string.sub(text, 1 + (i * lineLength), (1 + (i * lineLength)) + lineLength)
+		gfx.drawText(lineText, 60 + xOffset, 63 + (i * 20) + yOffset)
+	end
 	
+	gfx.drawRect(50 + xOffset, 60 + yOffset, boxWidth, lines * 20)
+	gfx.fillRect(boxWidth + 50 + xOffset, 59 + yOffset + 5, 5, lines * 20)
+	gfx.fillRect(55 + xOffset, 60 + yOffset + (lines * 20), boxWidth, 5)
 	coworker:talk()
-	-- disable input and game, press A to continue
 end
 
 local function initialize()
@@ -548,8 +575,6 @@ local function renderUI()
 	
 	-- spin gauge
 	renderSpinMeter()
-	gfx.drawRect(149, 218, 40, 14)
-	gfx.drawRect(210, 218, 40, 14)
 
 	-- SMASH available indicator
 	if blink.on then
@@ -588,7 +613,7 @@ function playdate.update()
 		-- pre game dialog
 		if showDialog then
 			
-			drawDialogue(round.dialog[dialogCount][2])
+			drawDialogue(round.dialog[dialogCount][2], round.dialog[dialogCount][1])
 			
 			if playdate.buttonJustPressed(playdate.kButtonA) then
 				
