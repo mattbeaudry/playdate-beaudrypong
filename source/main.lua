@@ -89,9 +89,6 @@ local function updateSpinMeter()
 			gaugeLevel = -gaugeLevel
 		end
 	end
-	
-	print("gaugeLevel: "..gaugeLevel)
-	
 end
 
 local function renderSpinMeter()
@@ -114,7 +111,6 @@ local function renderSpinMeter()
 end
 
 local function resetPoint()
-	print("RESET POINT")
 	ballSpeed = 0
 	ballMoving = false
 	ballServing = false
@@ -128,7 +124,6 @@ local function resetPoint()
 	coworker.velocityX = 0
 	player:resetPoint()
 	updateSpinMeter()
-	print("ballUpForce"..ballUpForce)
 end
 
 local function resetGame()
@@ -146,32 +141,22 @@ local function resetScreen()
 end
 
 local function calculateSpin(paddleLocation, person)
-	print("")
-	print("CALC SPIN: "..person)
 	local addSpin = 0
 	local maxSpin = 20
 	local maxAccuracy = 30
 	local accuracy = 0
 	
 	if paddleLocation < ballSprite.y then
-		print("paddle below ball")
 		-- check how far ball is from paddle
 		local difference = ballSprite.y - paddleLocation
-		print("difference: "..difference)
 		accuracy = maxAccuracy - difference
-		print("accuracy: "..accuracy)
 	elseif paddleLocation > ballSprite.y then
-		print("paddle above ball")
 		-- check how far ball is from paddle
 		local difference = paddleLocation - ballSprite.y
-		print("difference: "..difference)
 		accuracy = maxAccuracy - difference
-		print("accuracy: "..accuracy)
 	else
 		-- set accuracy and ballspin to best option
-		print("paddle PERFECT alignment")
 		accuracy = maxAccuracy
-		print("accuracy: "..accuracy)
 	end
 	
 	addSpin = accuracy
@@ -187,7 +172,6 @@ local function calculateSpin(paddleLocation, person)
 		-- gfx.drawLine(coworker.x-30,coworker.y+20,coworker.x-70, coworker.y+20)
 	end
 	
-	print("ballSpin: "..ballSpin)
 	updateSpinMeter()
 end
 
@@ -263,13 +247,15 @@ local function coworkerSwings()
 end
 
 local function serve()
+	
+	-- player ready to serve
 	if whoIsServing == 'none' then
-		print("player ready to serve")
 		ballSprite:moveTo(player.x + 38, player.y - 20)
 		player:serve()
 		whoIsServing = "player"
+		
+	-- throw to serve
 	else
-		print("throw to serve")
 		ballServing = true
 		local throwBall = ballSprite.y - 30
 		
@@ -280,8 +266,6 @@ local function serve()
 			ballSprite:moveTo(300, throwBall)
 			coworker:throw()
 		end
-		
-		print("ballUpForce"..ballUpForce)
 		
 		ballUpForce += 15
 		ballSpeed = 0
@@ -334,8 +318,6 @@ local function swing(type)
 end
 
 local function updateScore(who, howMuch)
-	print("update score for ".. who)
-	
 	score[round.round][who] += howMuch
 	
 	if who == 2 then
@@ -364,7 +346,6 @@ end
 
 local function injurePlayer(player)
 	-- player shows injured sprite and flys off screen
-	print("injure coworker")
 	coworker.velocityX = 40
 	coworker:injured()
 end
@@ -372,12 +353,8 @@ end
 local function moveBall()
 	if ballMoving or ballServing then
 		
-		print("ball.x: "..ballSprite.x)
-		print("ball.y: "..ballSprite.y)
-		
 		-- ball hits table
 		if ballSprite.x > tableEdgeLeft and ballSprite.x < tableEdgeRight then
-			print("ball hits table")
 			if ballSprite.y > tableEdgeTop and ballLastTouched ~= "table" then
 				playHitSound()
 				ballUpForce = (ballUpForce + 30) * ballBounceMultiplier
@@ -391,13 +368,8 @@ local function moveBall()
 			
 			--ball hits coworker
 			if ballSprite.x > 300 then
-				print("ball hits coworker")
-				
 				if hitType == "smash" then
 					if scoreUpdated == false then
-						print("")
-						print("ball hits coworker and it was a smash!!!")
-						
 						injurePlayer("coworker")
 						showMessage = true
 						
@@ -413,9 +385,7 @@ local function moveBall()
 					playdate.timer.performAfterDelay(1200, function()
 						scoreUpdated = false
 					end)
-					
 				else
-					
 					if coworker.hasSwung == false then
 						coworkerSwings()
 						coworker.hasSwung = true
@@ -427,7 +397,6 @@ local function moveBall()
 			
 			--ball hits player
 			elseif ballSprite.x < 75 then
-				
 				updateScore(2,1)
 				showMessage = true
 				resetPoint()
@@ -437,32 +406,21 @@ local function moveBall()
 		
 		-- ball hits floor
 		if ballSprite.y > floorEdge then
-			print("ball hits floor")
-			print("ball.x: "..ballSprite.x)
-			print("ball.y: "..ballSprite.y)
-			
 			ballUpForce = (ballUpForce + 30) * ballBounceMultiplier
 			ballBounceMultiplier *= 0.8
 		end
 		
 		-- ball hits ceiling
 		if ballSprite.y < 0 then
-			print("ball hits ceiling")
 			ballUpForce = (ballUpForce - 30) * ballBounceMultiplier
 		end
 		
 		-- ball off the screen
 		if ballSprite.x > 400 or ballSprite.x < 0 or ballSprite.y > 240 then
-			print("ball off screennnnn")
-			print("ball.x: "..ballSprite.x)
-			print("ball.y: "..ballSprite.y)
-			
 			if hitType ~= 'smash' and ballMoving == true then
 				if ballLastTouched == "player" then
-					-- player touched last, coworker +1 point
 					updateScore(2, 1)
 				elseif ballLastTouched == "coworker" then
-					-- coworker touched last, player +1 point
 					updateScore(1, 1)
 				elseif ballLastTouched == "table" or ballLastTouched == "none" then
 					if ballSprite.x < 200 then
@@ -477,8 +435,6 @@ local function moveBall()
 				resetSprites()
 			end
 		end
-		
-		print("ballUpForce"..ballUpForce)
 		
 		-- move ball
 		local verticalSpeed = gravity - ballUpForce
@@ -716,7 +672,7 @@ function playdate.update()
 				
 				if whoIsServing == 'coworker' then
 					
-					-- move coworker up and down and then throw for a serve
+					-- todo: move coworker up and down and then throw for a serve
 						
 					if coworker.hasServed == false then
 						coworker.hasServed = true

@@ -20,6 +20,7 @@
 	- player/coworker stance bounce
 - better sound and theme music
 - tutorial or better how to
+
 - bug fixes / refactoring
 	- only can smash when gauge full
 	- higher serve throw
@@ -52,6 +53,7 @@
 - better dialog system
 	- better box style
 	- move box depending on which character is talking
+	
 - bug fixes / refactoring
 	- coworker graphics alignment when swinging etc.
 	- player swinging messes up coworker while serving
