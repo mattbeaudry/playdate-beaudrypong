@@ -2,12 +2,15 @@
 
 ## TODO ALPHA
 - game score calc and hi score board, game stats: smashes, how long the rallies were, missed swings, swing accuracy etc.
-- miss/poor/good/great/perfect onscreen labels for shot accuracy feedback
 - improved desk graphics for server developers - missing trashed sprites
 - bug fixes
+	- coworker spincalc is perfect every time because the ai just follows the y position of the ball
+	- tweak spin calc sensitivity so gameplay is decent
 
 ## TODO RELEASE
-- improve smash wind up meter and make it count for how fast the smash is
+- improve smash wind up meter
+	- UI gauge
+	- make it count for how fast the smash is
 - coworker ai improvement: 
 	- not perfect swing every time
 	- don't follow ball.y perfectly
@@ -25,6 +28,7 @@
 	- only can smash when gauge full
 	- higher serve throw
 	- move more code out of main file
+	 - remove unneeded boss class
 
 # DONE
 - player, table, ball and coworker graphics
@@ -44,7 +48,7 @@
 - dialog system
 - rounds class for diff rounds of the game, data includes:
 	- pre-round dialog between boss and developer
-	- game timespeed
+	- game time speed
 	- opponent: [player, boss, coworker, designer, pm]
 	- skill level of coworker AI
 	- score for each round and score board
@@ -53,6 +57,7 @@
 - better dialog system
 	- better box style
 	- move box depending on which character is talking
+- miss/poor/good/great/perfect onscreen labels for shot accuracy feedback
 	
 - bug fixes / refactoring
 	- coworker graphics alignment when swinging etc.
@@ -68,4 +73,5 @@
 # IDEAS
 - what if boss doesn't have a paddle and just hits the ball with his hand
 - use the crank, maybe a "super smash" that requires it
+	- crank to aim smash? crank to dodge a coworkers smash
 - what if crank was the vertical position of the player

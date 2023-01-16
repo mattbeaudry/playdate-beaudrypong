@@ -88,11 +88,6 @@ function Round:new()
 	function self:nextRound()
 		self.round += 1
 		self:setRound()
-		print("")
-		print("ROUND, TIMESPEED")
-		print(self.round)
-		print(self.timeSpeed)
-		print("")
 	end
 	
 	return self

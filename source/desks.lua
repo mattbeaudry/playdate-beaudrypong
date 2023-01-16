@@ -74,7 +74,6 @@ function Desks:new()
 	end
 	
 	function self:clearDesks()
-		print("CLEAR DESKS")
 		for i = 1, #self.currentDesks do
 			self.deskSprites[i]:remove()
 			-- gfx.sprite:updateSprite(self.deskSprites[i])
@@ -84,7 +83,6 @@ function Desks:new()
 	
 	function self:drawDesks()
 		self:clearDesks()
-		print("DRAW DESKS")
 		for i = 1, #self.currentDesks do
 		  self.deskSprites[i]:add()
 		  self.deskSprites[i]:updateEmployee(self.currentDesks[i][1])

@@ -45,10 +45,10 @@ function Story:new()
 		gfx.drawText("--: Okay, but we are in the middle of a game", 20, 160)
 	end
 	
-	function self:endScreen(score, maxScore)
+	function self:endScreen(score, maxScore, playerScore)
 		
 		if score[4][1] >= maxScore then
-			gfx.drawText("Congratulations, you won the tournament!", 30, 75)
+			gfx.drawText("Congratulations, you won the tournament!", 30, 30)
 			gfx.drawText("The company burns to the ground", 30, 90)
 			gfx.drawText("and you lose your job.", 30, 105)
 			gfx.drawText("YOU WIN", 30, 135)
@@ -59,10 +59,10 @@ function Story:new()
 			gfx.drawText("GAME OVER", 30, 125)
 		end
 		
-		gfx.drawText("ROUND 1:  Player-" .. score[1][1] .. "  C-" .. score[1][2], 30, 160)
-		gfx.drawText("ROUND 2:  Player-" .. score[2][1] .. "  C-" .. score[2][2], 30, 175)
-		gfx.drawText("ROUND 3:  Player-" .. score[3][1] .. "  C-" .. score[3][2], 30, 190)
-		gfx.drawText("ROUND 4:  Player-" .. score[4][1] .. "  C-" .. score[4][2], 30, 205)
+		gfx.drawText("ROUND 1: " .. score[1][1] .. " - " .. score[1][2], 30, 160)
+		gfx.drawText("ROUND 2: " .. score[2][1] .. " - " .. score[2][2], 30, 175)
+		gfx.drawText("ROUND 3: " .. score[3][1] .. " - " .. score[3][2], 30, 190)
+		gfx.drawText("ROUND 4: " .. score[4][1] .. " - " .. score[4][2], 30, 205)
 		
 		gfx.drawText("PRESS A", 330, 210)
 	end
