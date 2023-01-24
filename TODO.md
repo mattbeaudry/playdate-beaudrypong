@@ -1,34 +1,39 @@
 # TODO
 
-## TODO ALPHA
-- game score calc and hi score board, game stats: smashes, how long the rallies were, missed swings, swing accuracy etc.
-- improved desk graphics for server developers - missing trashed sprites
-- bug fixes
-	- coworker spincalc is perfect every time because the ai just follows the y position of the ball
-	- tweak spin calc sensitivity so gameplay is decent
-
-## TODO RELEASE
+## TODO FEATURES
+- hi score board
+	- game stats: smashes, how long the rallies were, missed swings, swing accuracy etc.
+	- saving hi scores
+	- viewing hi scores
+	- stats on endScreen
 - improve smash wind up meter
 	- UI gauge
 	- make it count for how fast the smash is
-- coworker ai improvement: 
-	- not perfect swing every time
-	- don't follow ball.y perfectly
-	- move up/down before serving
-	- coworker can smash
 - office environment movement animation:
+	- improved desk graphics for server developers - missing trashed sprites
 	- server light flash
 	- boss getting up crossing arms from time to time, maybe during a smash windup? 
 	- 2 frame animation for each desk employee+state
 	- player/coworker stance bounce
+- coworker ai improvement: 
+	- coworker spinCalc is perfect every time because the ai just follows the y position of the ball
+	- not perfect swing every time
+	- don't follow ball.y perfectly
+	- move up/down before serving
+	- coworker can smash
 - better sound and theme music
 - tutorial or better how to
-
-- bug fixes / refactoring
-	- only can smash when gauge full
-	- higher serve throw
-	- move more code out of main file
-	 - remove unneeded boss class
+- cutscene between rounds where current player leaves and desks get trashed then new player walks up to dialog standing area
+	
+## TODO FIXES
+- tweak spin calc sensitivity so gameplay is decent
+- only can smash when gauge full
+- higher serve throw
+- move more code out of main file
+- remove unneeded boss class
+- things don't reset properly after playing a game and starting a second game
+- ball pauses in thin air once a point is made, after point ball logic, it should roll off screen
+- player should be holding ball at beginning of his serve
 
 # DONE
 - player, table, ball and coworker graphics

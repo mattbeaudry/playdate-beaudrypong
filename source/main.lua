@@ -10,6 +10,7 @@ import "boss"
 import "story"
 import "desks"
 import "round"
+import "score"
 
 local debug = false
 local gameState = "title"
@@ -25,6 +26,7 @@ local boss = Boss:new()
 local story = Story:new()
 local desks = Desks:new()
 local round = Round:new()
+local score = Score:new()
 
 local ball = gfx.image.new("images/ball-outline")
 local tableSprite = gfx.sprite.new(gfx.image.new("images/table"))
@@ -53,33 +55,16 @@ local paddleLocation = 0
 local time = 0
 local timeSpeed = 4
 local seconds = 0
-
-local score = {
-	{0, 0},
-	{0, 0},
-	{0, 0},
-	{0, 0},
-}
-local stats = {}
-stats['perfectHits'] = 0
-stats['greatHits'] = 0
-stats['goodHits'] = 0
-stats['poorHits'] = 0
-stats['smashes'] = 0
-local playerScore = 0
-
-local accuracyDisplay = {}
-accuracyDisplay['perfect'] = { false, false }
-accuracyDisplay['great'] = { false, false }
-accuracyDisplay['good'] = { false, false }
-
 local scoreUpdated = false
-local maxScore = 3
 local gravity = 20
 local showMessage = false
 local gaugeMax = 3
 local gaugeLevel = 0
 local dialogCount = 1
+local accuracyDisplay = {}
+accuracyDisplay['perfect'] = { false, false }
+accuracyDisplay['great'] = { false, false }
+accuracyDisplay['good'] = { false, false }
 
 local function resetTimer()
 	playTimer = playdate.timer.new(1000000, 0, 1000000, playdate.easingFunctions.linear)
@@ -100,8 +85,6 @@ local function updateSpinMeter(accuracy, person)
 	print("gaugeLevel"..gaugeLevel)
 	
 	local gaugeChange = 0
-	
-	-- print("person"..person)
 	
 	if accuracy == 'perfect' then
 		gaugeChange = 3
@@ -143,10 +126,6 @@ local function renderSpinMeter()
 	gfx.drawRect(156, 218, 88, 14)
 end
 
-local function calculateScore()
-	playerScore = score[1][1] + score[2][1] + score[3][1] + score[4][1] + stats['perfectHits'] + stats['greatHits'] + stats['goodHits'] + stats['smashes']
-end
-
 local function resetPoint()
 	ballSpeed = 0
 	ballMoving = false
@@ -159,7 +138,7 @@ local function resetPoint()
 	ballLastTouched = "none"
 	gaugeLevel = 0
 	coworker.velocityX = 0
-	calculateScore()
+	score:calculateScore()
 	player:resetPoint()
 	updateSpinMeter()
 end
@@ -207,7 +186,7 @@ local function calculateSpin(paddleLocation, person)
 	if difference <= 3 then
 		print("PERFECT !!!")
 		accuracy = 'perfect'
-		stats['perfectHits'] += 1
+		score.stats['perfectHits'] += 1
 		accuracyDisplay['perfect'][person == 'player' and 1 or 2] = true
 		playdate.timer.performAfterDelay(500, function()
 			accuracyDisplay['perfect'][person == 'player' and 1 or 2] = false
@@ -215,7 +194,7 @@ local function calculateSpin(paddleLocation, person)
 	elseif difference <= 9 then
 		print("GREAT")
 		accuracy = 'great'
-		stats['greatHits'] += 1
+		score.stats['greatHits'] += 1
 		accuracyDisplay['great'][person == 'player' and 1 or 2] = true
 		playdate.timer.performAfterDelay(500, function()
 			accuracyDisplay['great'][person == 'player' and 1 or 2] = false
@@ -223,46 +202,16 @@ local function calculateSpin(paddleLocation, person)
 	elseif difference <= 20 then
 		print("GOOD")
 		accuracy = 'good'
-		stats['goodHits'] += 1
+		score.stats['goodHits'] += 1
 		accuracyDisplay['good'][person == 'player' and 1 or 2] = true
 		playdate.timer.performAfterDelay(500, function()
 			accuracyDisplay['good'][person == 'player' and 1 or 2] = false
 		end)
 	else 
 		accuracy = 'poor'
-		stats['poorHits'] += 1
+		score.stats['poorHits'] += 1
 		print("POOR")
 	end
-	
-	-- else
-	-- 	print("PERFECT")
-	-- 	-- set accuracy and ballspin to best option
-	-- 	accuracy = maxAccuracy
-	-- 	stats['perfectHits'] += 1
-	-- end
-	
-	-- addSpin = accuracy
-	
-	-- print("accuracy: "..accuracy)
-	
-	-- -- hit spin indicator
-	-- if person == 'player' then
-	-- 	
-	-- 	print('player')
-	-- 	
-	-- 	-- ballSpin += addSpin
-	-- 	-- gfx.drawLine(player.x-30,player.y-30,player.x-70, player.y-30)
-	-- 	-- gfx.drawText("SPIN +++", player.x+30, player.y-45)
-	-- elseif person == 'coworker' then
-	-- 	
-	-- 	print('coworker')
-	-- 	
-	-- 	-- ballSpin -= addSpin
-	-- 	-- gfx.drawText("SPIN ---", coworker.x-30, coworker.y-45)
-	-- 	-- gfx.drawLine(coworker.x-30,coworker.y+20,coworker.x-70, coworker.y+20)
-	-- end
-	
-	-- print("ballSpin: "..ballSpin)
 	
 	updateSpinMeter(accuracy, person)
 end
@@ -313,8 +262,8 @@ local function coworkerSwings()
 	local r = math.random(1, 20)
 	
 	if r == 1 then
-		score[round.round][1] += 1
-		if score[round.round][1] == maxScore then 
+		score.roundScores[round.round][1] += 1
+		if score.roundScores[round.round][1] == score.maxScore then 
 			if round.round == 4 then
 				gameState = "end"
 			else
@@ -390,7 +339,7 @@ local function hitSmash()
 	ballLastTouched = "player"
 	ballSpeed += 70 * ballSpeedMultiplier
 	hitType = "smash"
-	stats['smashes'] += 1
+	score.stats['smashes'] += 1
 end
 
 local function swing(type)
@@ -411,7 +360,7 @@ local function swing(type)
 end
 
 local function updateScore(who, howMuch)
-	score[round.round][who] += howMuch
+	score.roundScores[round.round][who] += howMuch
 	
 	if who == 2 then
 		whoIsServing = 'coworker'
@@ -419,7 +368,7 @@ local function updateScore(who, howMuch)
 		whoIsServing = 'none'
 	end
 	
-	if score[round.round][who] == maxScore then
+	if score.roundScores[round.round][who] == score.maxScore then
 		if round.round == 4 then
 			gameState = "end"
 		else
@@ -541,12 +490,12 @@ local function moveBall()
 end
 
 local function drawDialogue(text, employee)
-	local lineLength = 18;
-	local boxWidth = 150;
+	local lineLength = 18
+	local boxWidth = 150
 	local textLength = string.len(text)
 	local lines = math.ceil(textLength / lineLength)
-	local xOffset = 0;
-	local yOffset = 0;
+	local xOffset = 0
+	local yOffset = 0
 	
 	if employee == 'player' then
 		yOffset = 30
@@ -605,8 +554,8 @@ local function renderUI()
 	end
 
 	-- scoreboard
-	gfx.drawText(score[round.round][1], 55, 220)
-	gfx.drawText(score[round.round][2], 340, 220)
+	gfx.drawText(score.roundScores[round.round][1], 55, 220)
+	gfx.drawText(score.roundScores[round.round][2], 340, 220)
 	gfx.drawText("ROUND: "..round.round, 180, 205)
 	
 	-- accuracy indicator
@@ -616,9 +565,9 @@ local function renderUI()
 	if accuracyDisplay['great'][1] then
 		gfx.drawText("GREAT", 100, 130)
 	end
-	if accuracyDisplay['good'][1] then
-		gfx.drawText("GOOD", 100, 130)
-	end
+	-- if accuracyDisplay['good'][1] then
+	-- 	gfx.drawText("GOOD", 100, 130)
+	-- end
 	
 	if accuracyDisplay['perfect'][2] then
 		gfx.drawText("PERFECT", 290, 130)
@@ -626,9 +575,9 @@ local function renderUI()
 	if accuracyDisplay['great'][2] then
 		gfx.drawText("GREAT", 290, 130)
 	end
-	if accuracyDisplay['good'][2] then
-		gfx.drawText("GOOD", 290, 130)
-	end
+	-- if accuracyDisplay['good'][2] then
+	-- 	gfx.drawText("GOOD", 290, 130)
+	-- end
 	
 	-- point indicator
 	if showMessage then
@@ -818,6 +767,9 @@ function playdate.update()
 		if playdate.buttonJustPressed(playdate.kButtonA) then
 			gameState = "howto"
 		end
+		if playdate.buttonJustPressed(playdate.kButtonB) then
+			gameState = "scoreboard"
+		end
 	elseif gameState == "howto" then
 		resetScreen()
 		story:howToPlay()
@@ -842,8 +794,30 @@ function playdate.update()
 		gfx.sprite.removeAll()
 		gfx.sprite.update()
 		resetScreen()
-		story:endScreen(score, maxScore, playerScore)
+		story:endScreen(score.roundScores, score.maxScore, score.totalScore, score.stats)
+				
+		if score.scoreAdded == false then
+			score:addScore()
+			score.scoreAdded = true
+		end
+		
 		if playdate.buttonJustPressed(playdate.kButtonA) then
+			gameState = "title"
+			gfx.sprite.removeAll()
+			gfx.sprite.update()
+		end
+		if playdate.buttonJustPressed(playdate.kButtonB) then
+			gameState = "scoreboard"
+			gfx.sprite.removeAll()
+			gfx.sprite.update()
+		end
+	elseif gameState == "scoreboard" then
+		gfx.sprite.removeAll()
+		gfx.sprite.update()
+		resetScreen()
+		score:scoreboard()
+		if playdate.buttonJustPressed(playdate.kButtonA) then
+			score.scoreAdded = false
 			gameState = "title"
 			gfx.sprite.removeAll()
 			gfx.sprite.update()
