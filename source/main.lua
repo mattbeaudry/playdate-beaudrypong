@@ -148,6 +148,7 @@ local function resetGame()
 	time = 0
 	seconds = 0
 	whoIsServing = 'none'
+	score:resetScores()
 end
 
 local function resetScreen()
@@ -765,23 +766,22 @@ function playdate.update()
 	elseif gameState == "title" then
 		story:titleScreen()
 		if playdate.buttonJustPressed(playdate.kButtonA) then
-			gameState = "howto"
+			gameState = "mission"
 		end
 		if playdate.buttonJustPressed(playdate.kButtonB) then
 			gameState = "scoreboard"
-		end
-	elseif gameState == "howto" then
-		resetScreen()
-		story:howToPlay()
-		if playdate.buttonJustPressed(playdate.kButtonA) then
-			gameState = "mission"
 		end
 	elseif gameState == "mission" then
 		resetScreen()
 		story:missionScreen()
 		if playdate.buttonJustPressed(playdate.kButtonA) then
+			gameState = "howto"
+		end
+	elseif gameState == "howto" then
+		resetScreen()
+		story:howToPlay()
+		if playdate.buttonJustPressed(playdate.kButtonA) then
 			gameState = "play"
-			
 			showDialog = true
 			initialize()
 			
@@ -800,7 +800,6 @@ function playdate.update()
 			score:addScore()
 			score.scoreAdded = true
 		end
-		
 		if playdate.buttonJustPressed(playdate.kButtonA) then
 			gameState = "title"
 			gfx.sprite.removeAll()

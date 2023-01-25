@@ -21,8 +21,9 @@ function Story:new()
 		
 		gfx.drawText("PRESS UP and DOWN to move", 20, 80)
 		gfx.drawText("PRESS A to serve and swing", 20, 100)
-		gfx.drawText("swing above or below the ball to add SPIN", 20, 120)
-		gfx.drawText("HOLD B to charge, release to SMASH", 20, 140)
+		gfx.drawText("Accurate shots add more spin", 20, 120)
+		gfx.drawText("FILL spin meter to enable a smash", 20, 140)
+		gfx.drawText("HOLD B to charge, RELEASE to smash", 20, 160)
 		
 		gfx.drawText("PRESS A", 330, 210)
 	end

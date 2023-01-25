@@ -1,11 +1,6 @@
 # TODO
 
 ## TODO FEATURES
-- hi score board
-	- game stats: smashes, how long the rallies were, missed swings, swing accuracy etc.
-	- saving hi scores
-	- viewing hi scores
-	- stats on endScreen
 - improve smash wind up meter
 	- UI gauge
 	- make it count for how fast the smash is
@@ -24,6 +19,7 @@
 - better sound and theme music
 - tutorial or better how to
 - cutscene between rounds where current player leaves and desks get trashed then new player walks up to dialog standing area
+- better animation or particle effect for swing AND hit
 	
 ## TODO FIXES
 - tweak spin calc sensitivity so gameplay is decent
@@ -34,8 +30,9 @@
 - things don't reset properly after playing a game and starting a second game
 - ball pauses in thin air once a point is made, after point ball logic, it should roll off screen
 - player should be holding ball at beginning of his serve
+- stats are catering too long rallies in rounds
 
-# DONE
+## DONE FEATURES
 - player, table, ball and coworker graphics
 - player swing and serve
 - ball movement physics and logic
@@ -63,7 +60,13 @@
 	- better box style
 	- move box depending on which character is talking
 - miss/poor/good/great/perfect onscreen labels for shot accuracy feedback
+- hi score board
+- game stats: smashes, how long the rallies were, missed swings, swing accuracy etc.
+- saving hi scores
+- viewing hi scores
+- stats on endScree
 	
+## DONE FIXES
 - bug fixes / refactoring
 	- coworker graphics alignment when swinging etc.
 	- player swinging messes up coworker while serving

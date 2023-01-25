@@ -30,6 +30,10 @@ function Score:new()
 	self.stats['poorHits'] = 0
 	self.stats['smashes'] = 0
 	
+	-- some stats to add
+	self.stats['roundsWon'] = 0
+	self.stats['tournamentWon'] = false
+	
 	function self:scoreboard()
 		local scoreData = data.read("scores") or {}
 		
@@ -59,6 +63,15 @@ function Score:new()
 	
 	function self:calculateScore()
 		self.totalScore = self.roundScores[1][1] + self.roundScores[2][1] + self.roundScores[3][1] + self.roundScores[4][1] + self.stats['goodHits'] + self.stats['greatHits'] + self.stats['perfectHits'] + self.stats['smashes']
+	end
+	
+	function self:resetScores()
+		self.roundScores = {
+			{0, 0},
+			{0, 0},
+			{0, 0},
+			{0, 0},
+		}
 	end
 	
 	return self

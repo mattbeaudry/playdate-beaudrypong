@@ -15,11 +15,11 @@ function Round:new()
 		self.dialog = {
 			{
 				"coworker",
-				"get back to twerk, i mean work",
+				"Hey, down for a quick pong tournament?",
 			},
 			{
 				"player",
-				"but we just started the tournament",
+				"After launching code to production? I'm in!!",
 			}
 		}
 		self.timeSpeed = 5
@@ -31,11 +31,11 @@ function Round:new()
 		self.dialog = { 
 			{
 				"developer",
-				"we've been hacked", 
+				"The site is down and we got hacked! Customers are losing data.", 
 			},
 			{
 				"player",
-				"almost done!",
+				"It'll be fine, one more game!",
 			}
 		}
 		self.timeSpeed = 4
@@ -47,11 +47,11 @@ function Round:new()
 		self.dialog = { 
 			{
 				"designer",
-				"the servers are on fire!",
+				"The servers are on fire we have to evacuate the building!",
 			},
 			{
 				"player",
-				"one more round!"
+				"Not after I beat you!"
 			}
 		}
 		self.timeSpeed = 3
@@ -63,11 +63,11 @@ function Round:new()
 		self.dialog = {
 			{
 				"boss",
-				"fine but if i win you fix things",
+				"The company is destroyed. If I win, you fix things! ",
 			},
 			{
 				"player",
-				"okie dokie!" 
+				"Okie dokie!" 
 			}
 		}
 		self.timeSpeed = 2
