@@ -225,6 +225,8 @@ local function playHitSound()
 end
 
 local function coworkerHits()
+	print("coworker hits")
+	
 	ballMoving = true
 	ballServing = false
 	playHitSound()
@@ -255,6 +257,7 @@ local function coworkerHits()
 end
 
 local function coworkerSwings()
+	print("coworker swings")
 	gfx.drawLine(coworker.x-30, coworker.y-30, coworker.x-70, coworker.y-30)
 	gfx.drawLine(coworker.x-30, coworker.y+20, coworker.x-70, coworker.y+20)
 
@@ -289,15 +292,23 @@ local function coworkerSwings()
 end
 
 local function serve()
+	print("")
+	print("SERVEEEEEE")
+	print("whoIsServing"..whoIsServing)
+	print("ballServing"..tostring(ballServing))
 	
 	-- player ready to serve
 	if whoIsServing == 'none' then
+		print("player ready to serve")
+		
 		ballSprite:moveTo(player.x + 38, player.y - 20)
 		player:serve()
 		whoIsServing = "player"
 		
 	-- throw to serve
 	else
+		print("throw to serve")
+		
 		ballServing = true
 		local throwBall = ballSprite.y - 30
 		
@@ -344,6 +355,7 @@ local function hitSmash()
 end
 
 local function swing(type)
+	print("call swing() function")
 	gfx.drawLine(player.x+30,player.y-30,player.x + 70, player.y-30)
 	gfx.drawLine(player.x+30,player.y+20,player.x + 70, player.y+20)
 	player:swing()
@@ -361,15 +373,13 @@ local function swing(type)
 end
 
 local function updateScore(who, howMuch)
+	print("update score")
 	score.roundScores[round.round][who] += howMuch
 	
-	if who == 2 then
-		whoIsServing = 'coworker'
-	elseif who == 1 then
-		whoIsServing = 'none'
-	end
+	print("who" ..tostring(who))
 	
 	if score.roundScores[round.round][who] == score.maxScore then
+		print("game ending event")
 		if round.round == 4 then
 			gameState = "end"
 		else
@@ -384,6 +394,13 @@ local function updateScore(who, howMuch)
 			resetGame()
 			showDialog = true
 		end
+	else 
+		print("not game ending event, next round instead yo")
+		if who == 2 then
+			whoIsServing = 'coworker'
+		elseif who == 1 then
+			whoIsServing = 'none'
+		end
 	end
 end
 
@@ -394,6 +411,8 @@ local function injurePlayer(player)
 end
 
 local function moveBall()
+	print("moveBall")
+	
 	if ballMoving or ballServing then
 		
 		-- ball hits table
@@ -411,6 +430,7 @@ local function moveBall()
 			
 			--ball hits coworker
 			if ballSprite.x > 300 then
+				
 				if hitType == "smash" then
 					if scoreUpdated == false then
 						injurePlayer("coworker")
@@ -440,6 +460,7 @@ local function moveBall()
 			
 			--ball hits player
 			elseif ballSprite.x < 75 then
+				print("ball hits player")
 				updateScore(2,1)
 				showMessage = true
 				resetPoint()
@@ -461,6 +482,7 @@ local function moveBall()
 		-- ball off the screen
 		if ballSprite.x > 400 or ballSprite.x < 0 or ballSprite.y > 240 then
 			if hitType ~= 'smash' and ballMoving == true then
+				print("BALL off screen")
 				if ballLastTouched == "player" then
 					updateScore(2, 1)
 				elseif ballLastTouched == "coworker" then
@@ -480,6 +502,7 @@ local function moveBall()
 		end
 		
 		-- move ball
+		print("moveBall")
 		local verticalSpeed = gravity - ballUpForce
 		ballSprite:moveBy(ballSpeed, verticalSpeed)	
 		
@@ -665,9 +688,12 @@ function playdate.update()
 			
 			-- A just pressed
 			if playdate.buttonJustPressed(playdate.kButtonA) then
+				print("gameplay A just pressed")
+				
 				if ballMoving then
 					swing()
 				elseif whoIsServing == 'player' or whoIsServing == 'none' then
+					print("player about to serve")
 					serve()
 				end
 			end
@@ -721,6 +747,12 @@ function playdate.update()
 			end
 
 			-- Coworker ai
+			
+			print("")
+			print("coworker AI tests")
+			print("ballMoving" .. tostring(ballMoving))
+			print("ballServing" .. tostring(ballServing))
+			
 			if ballMoving and not ballServing then
 				--moveEmployee("coworker")
 				if ballSprite.y > 50 or ballSprite.y < 150 then
@@ -732,26 +764,39 @@ function playdate.update()
 			
 			-- Time
 			if time % timeSpeed == 0 then
+				print("time tick")
+				
+				print("whoIsServing" .. whoIsServing)
+				
 				moveBall()
 				
 				if whoIsServing == 'coworker' then
 					
+					print("")
+					print("coworker is serving!")
+					
 					-- todo: move coworker up and down and then throw for a serve
 						
 					if coworker.hasServed == false then
+						print("coworker hasServed, set timer events")
 						coworker.hasServed = true
 						coworker:serve()
 						ballSprite:moveTo(312, coworker.y - 20)
 						
 						playdate.timer.performAfterDelay(1000, function()
+							print("set coworker.hasServed to false inside timer")
 							coworker.hasServed = false
 						end)
+						
 						playdate.timer.performAfterDelay(1000, function()
+							print("coworker about to serve this was from a timer")
 							serve()
 						end)
 						
 						local swingTiming = 1000 + timeSpeed * 125
+						
 						playdate.timer.performAfterDelay(swingTiming, function()
+							print("coworker swings from a timer")
 							coworkerSwings()
 						end)
 					end
@@ -781,16 +826,28 @@ function playdate.update()
 		resetScreen()
 		story:howToPlay()
 		if playdate.buttonJustPressed(playdate.kButtonA) then
-			gameState = "play"
-			showDialog = true
+			
+			print("")
+			print("STARTING A NEW GAME")
+			
+			
+			
 			initialize()
+			showDialog = true
+			
+			print("ballMoving: " .. tostring(ballMoving))
+			print("whoIsServing: " .. whoIsServing)
+			
 			
 			-- start round 1
 			round:firstRound()
 			coworker.employee = round.opponent
 			coworker:stance()
+			
+			gameState = "play"
 		end
 	elseif gameState == "end" then
+		print("end the game")
 		gfx.sprite.removeAll()
 		gfx.sprite.update()
 		resetScreen()
