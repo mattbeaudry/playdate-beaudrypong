@@ -10,11 +10,6 @@ function Score:new()
 	self.wonTournament = false
 	self.winningRounds = 0
 	self.totalPoints = 0
-	self.perfectStrokes = 0
-	self.greatStrokes = 0
-	self.goodStrokes = 0
-	self.poorStrokes = 0
-	self.smashes = 0
 	self.roundScores = {
 		{0, 0},
 		{0, 0},
@@ -23,17 +18,18 @@ function Score:new()
 	}
 	self.maxScore = 1
 	self.totalScore = 0
+
 	self.stats = {}
 	self.stats['perfectHits'] = 0
 	self.stats['greatHits'] = 0
 	self.stats['goodHits'] = 0
 	self.stats['poorHits'] = 0
 	self.stats['smashes'] = 0
-	
+
 	-- some stats to add
 	self.stats['roundsWon'] = 0
 	self.stats['tournamentWon'] = false
-	
+
 	function self:scoreboard()
 		local scoreData = data.read("scores") or {}
 		
@@ -50,7 +46,7 @@ function Score:new()
 		
 		gfx.drawText("PRESS A", 330, 210)
 	end
-	
+
 	function self:addScore()
 		local scoreData = data.read("scores") or {}
 		local date = playdate.getTime()
@@ -60,11 +56,11 @@ function Score:new()
 		table.insert(scoreData, scoreRow)
 		data.write(scoreData, "scores", true)
 	end
-	
+
 	function self:calculateScore()
 		self.totalScore = self.roundScores[1][1] + self.roundScores[2][1] + self.roundScores[3][1] + self.roundScores[4][1] + self.stats['goodHits'] + self.stats['greatHits'] + self.stats['perfectHits'] + self.stats['smashes']
 	end
-	
+
 	function self:resetScores()
 		self.roundScores = {
 			{0, 0},
@@ -73,6 +69,6 @@ function Score:new()
 			{0, 0},
 		}
 	end
-	
+
 	return self
 end

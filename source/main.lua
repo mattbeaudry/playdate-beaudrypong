@@ -514,8 +514,8 @@ local function moveBall()
 end
 
 local function drawDialogue(text, employee)
-	local lineLength = 18
-	local boxWidth = 150
+	local lineLength = 23
+	local boxWidth = 200
 	local textLength = string.len(text)
 	local lines = math.ceil(textLength / lineLength)
 	local xOffset = 0
@@ -524,11 +524,15 @@ local function drawDialogue(text, employee)
 	if employee == 'player' then
 		yOffset = 30
 	else 
-		xOffset = 50
+		xOffset = 20
 	end
 	
 	for i = 0, lines do
 		local lineText = string.sub(text, 1 + (i * lineLength), (1 + (i * lineLength)) + lineLength)
+		local firstLetter = string.sub(lineText, 1, 1)
+		if firstLetter == ' ' then
+			lineText = string.sub(lineText, 2, lineLength)
+		end
 		gfx.drawText(lineText, 60 + xOffset, 63 + (i * 20) + yOffset)
 	end
 	

@@ -20,10 +20,10 @@
 - cutscene transitions between rounds
 	- current player leaves and desks get trashed
 	- then new player walks up to dialog standing area
-- tutorial or better how to
+- tutorial or better how to 
+- crank to move player and crank to wind the smash
 	
 ## TODO FIXES
-- dialog box width and leading space bug
 - tweak spin calc sensitivity so gameplay is decent
 - only can smash when gauge full
 - higher serve throw
@@ -80,6 +80,7 @@
 - sometimes coworker or player server throw goes up too high
 - things don't reset properly after playing a game and starting a second game
 - improved desk graphics for server developers - missing trashed sprites
+- dialog box width and leading space bug
 
 # IDEAS
 - what if boss doesn't have a paddle and just hits the ball with his hand
