@@ -12,6 +12,11 @@ import "desks"
 import "round"
 import "score"
 
+local snd <const> = playdate.sound
+local themeMusic = snd.fileplayer.new()
+themeMusic:load("sounds/shitty-pong-track-1-short")
+themeMusic:play()
+
 local debug = false
 local gameState = "title"
 

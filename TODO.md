@@ -5,18 +5,19 @@
 	- UI gauge
 	- make it count for how fast the smash is
 	- better animation or particle effect for swing AND hit
+	- ball streak animation
 - better sound and theme music
+- office environment movement animation
+- server light flash
+- boss getting up crossing arms from time to time, maybe during a smash windup? 
+- 2 frame animation for each desk employee+state
+- player/coworker stance bounce
 - coworker ai improvement
 	- coworker spinCalc is perfect every time because the ai just follows the y position of the ball
 	- not perfect swing every time
 	- don't follow ball.y perfectly
 	- move up/down before serving
 	- coworker can smash
-- office environment movement animation
-	- server light flash
-	- boss getting up crossing arms from time to time, maybe during a smash windup? 
-	- 2 frame animation for each desk employee+state
-	- player/coworker stance bounce
 - cutscene transitions between rounds
 	- current player leaves and desks get trashed
 	- then new player walks up to dialog standing area
@@ -29,7 +30,7 @@
 - higher serve throw
 - move more code out of main file
 - remove unneeded boss class
-- ball pauses in thin air once a point is made, after point ball logic, it should roll off screen
+- ball pauses in thin air once a point is made, after point ball logic, i  t should roll off screen
 - player should be holding ball at beginning of his serve
 - stats are catering too long rallies in rounds
 

@@ -16,9 +16,8 @@ function Score:new()
 		{0, 0},
 		{0, 0},
 	}
-	self.maxScore = 1
+	self.maxScore = 3
 	self.totalScore = 0
-
 	self.stats = {}
 	self.stats['perfectHits'] = 0
 	self.stats['greatHits'] = 0
@@ -35,7 +34,7 @@ function Score:new()
 		
 		gfx.drawText("HIGH SCORES", 30, 20)
 		
-		if data.read("scores") then
+		if data.read("scores") then 
 			for i = 1, #scoreData do
 				gfx.drawText(scoreData[i][1], 30, i * 15 + 40)
 				gfx.drawText(scoreData[i][2], 230, i * 15 + 40)
