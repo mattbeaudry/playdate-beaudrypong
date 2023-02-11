@@ -7,6 +7,9 @@
 	- better animation or particle effect for swing AND hit
 	- ball streak animation
 - better sound and theme music
+	- diff notes for bal bounce sound synth
+	- sound for smash wind up and hit
+	- sound for dialog
 - office environment movement animation
 - server light flash
 - boss getting up crossing arms from time to time, maybe during a smash windup? 

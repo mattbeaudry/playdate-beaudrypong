@@ -12,10 +12,11 @@ import "desks"
 import "round"
 import "score"
 
-local snd <const> = playdate.sound
-local themeMusic = snd.fileplayer.new()
-themeMusic:load("sounds/shitty-pong-track-1-short")
-themeMusic:play()
+-- todo: move to class
+-- local snd <const> = playdate.sound
+-- local themeMusic = snd.fileplayer.new()
+-- themeMusic:load("sounds/shitty-pong-track-1")
+-- themeMusic:play()
 
 local debug = false
 local gameState = "title"
@@ -263,8 +264,11 @@ end
 
 local function coworkerSwings()
 	print("coworker swings")
-	gfx.drawLine(coworker.x-30, coworker.y-30, coworker.x-70, coworker.y-30)
-	gfx.drawLine(coworker.x-30, coworker.y+20, coworker.x-70, coworker.y+20)
+	gfx.drawLine(coworker.x-25, coworker.y-20, coworker.x-70, coworker.y-30)
+	gfx.drawLine(coworker.x-25, coworker.y+10, coworker.x-70, coworker.y+20)
+	
+	-- swing arc line
+	gfx.drawArc(coworker.x, coworker.y, 30, -230, -130)
 
 	coworker:swing()
 	math.randomseed(playdate.getSecondsSinceEpoch())
@@ -361,8 +365,13 @@ end
 
 local function swing(type)
 	print("call swing() function")
-	gfx.drawLine(player.x+30,player.y-30,player.x + 70, player.y-30)
-	gfx.drawLine(player.x+30,player.y+20,player.x + 70, player.y+20)
+		
+	gfx.drawLine(player.x + 25, player.y - 20, player.x + 70, player.y-30)
+	gfx.drawLine(player.x + 25, player.y + 10, player.x + 70, player.y+20)
+	
+	-- swing arc line
+	gfx.drawArc(player.x, player.y, 30, -230, -130)
+	
 	player:swing()
 	
 	if ballSprite.x < 100 then
