@@ -59,8 +59,24 @@ function Player:new()
 		self:setImage(playerSmash)
 	end
 	
+	local function randomAngle()
+	  return math.random() * 2 * math.pi
+	end
+	
+	local function randomPointOnCircle(radius, center_x, center_y)
+	  local angle = randomAngle()
+	  local x = radius * math.cos(angle) + center_x
+	  local y = radius * math.sin(angle) + center_y
+	  return x, y
+	end
+	
 	function self:smashWinding()
 		self.playerSmashPower += 1
+		local rRadius = math.random(0, 30)
+		local paddleX = self.x - 35
+		local paddleY = self.y - 35
+		local x, y = randomPointOnCircle(rRadius, paddleX, paddleY)
+		gfx.drawLine(paddleX, paddleY, x, y)
 	end
 	
 	return self

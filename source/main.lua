@@ -11,20 +11,16 @@ import "story"
 import "desks"
 import "round"
 import "score"
-
--- todo: move to class
--- local snd <const> = playdate.sound
--- local themeMusic = snd.fileplayer.new()
--- themeMusic:load("sounds/shitty-pong-track-1")
--- themeMusic:play()
+import "sound"
 
 local debug = false
 local gameState = "title"
 
 local gfx <const> = playdate.graphics
-local font = gfx.font.new('font/Nano Sans 2X/Nano Sans 2X')
 local snd <const> = playdate.sound
 local blink = gfx.animation.blinker.new()
+
+local font = gfx.font.new('font/Nano Sans 2X/Nano Sans 2X')
 
 local player = Player:new()
 local coworker = Coworker:new()
@@ -33,6 +29,8 @@ local story = Story:new()
 local desks = Desks:new()
 local round = Round:new()
 local score = Score:new()
+local sound = Sound:new()
+sound:startMusic()
 
 local ball = gfx.image.new("images/ball-outline")
 local tableSprite = gfx.sprite.new(gfx.image.new("images/table"))
@@ -86,9 +84,6 @@ local function resetSprites()
 end
 
 local function updateSpinMeter(accuracy, person)
-	print("gauge level")
-	
-	print("gaugeLevel"..gaugeLevel)
 	
 	local gaugeChange = 0
 	
@@ -109,8 +104,6 @@ local function updateSpinMeter(accuracy, person)
 	else
 		gaugeLevel -= gaugeChange
 	end
-	
-	print("gaugeLevel"..gaugeLevel)
 end
 
 local function renderSpinMeter()
@@ -171,27 +164,16 @@ local function calculateSpin(paddleLocation, person)
 	local difference = 0
 	local accuracy = ''
 	
-	print("")
-	
-	print("maxAccuracy: "..maxAccuracy)
-	print("paddleLocation"..paddleLocation)
-	print("ballSprite.y"..ballSprite.y)
-	
 	-- check how far ball is from paddle
 	if paddleLocation < ballSprite.y then
-		print("paddle ABOVE ball: ")
 		difference = ballSprite.y - paddleLocation
-		print("difference: "..difference)
 		--accuracy = maxAccuracy - difference
 	elseif paddleLocation > ballSprite.y then
-		print("paddle BELOW ball")
 		difference = paddleLocation - ballSprite.y
-		print("difference: "..difference)
 		--accuracy = maxAccuracy - difference
 	end
 	
 	if difference <= 3 then
-		print("PERFECT !!!")
 		accuracy = 'perfect'
 		score.stats['perfectHits'] += 1
 		accuracyDisplay['perfect'][person == 'player' and 1 or 2] = true
@@ -199,7 +181,6 @@ local function calculateSpin(paddleLocation, person)
 			accuracyDisplay['perfect'][person == 'player' and 1 or 2] = false
 		end)
 	elseif difference <= 9 then
-		print("GREAT")
 		accuracy = 'great'
 		score.stats['greatHits'] += 1
 		accuracyDisplay['great'][person == 'player' and 1 or 2] = true
@@ -207,7 +188,6 @@ local function calculateSpin(paddleLocation, person)
 			accuracyDisplay['great'][person == 'player' and 1 or 2] = false
 		end)
 	elseif difference <= 20 then
-		print("GOOD")
 		accuracy = 'good'
 		score.stats['goodHits'] += 1
 		accuracyDisplay['good'][person == 'player' and 1 or 2] = true
@@ -217,7 +197,6 @@ local function calculateSpin(paddleLocation, person)
 	else 
 		accuracy = 'poor'
 		score.stats['poorHits'] += 1
-		print("POOR")
 	end
 	
 	updateSpinMeter(accuracy, person)
@@ -231,8 +210,6 @@ local function playHitSound()
 end
 
 local function coworkerHits()
-	print("coworker hits")
-	
 	ballMoving = true
 	ballServing = false
 	playHitSound()
@@ -263,7 +240,6 @@ local function coworkerHits()
 end
 
 local function coworkerSwings()
-	print("coworker swings")
 	gfx.drawLine(coworker.x-25, coworker.y-20, coworker.x-70, coworker.y-30)
 	gfx.drawLine(coworker.x-25, coworker.y+10, coworker.x-70, coworker.y+20)
 	
@@ -301,23 +277,15 @@ local function coworkerSwings()
 end
 
 local function serve()
-	print("")
-	print("SERVEEEEEE")
-	print("whoIsServing"..whoIsServing)
-	print("ballServing"..tostring(ballServing))
 	
 	-- player ready to serve
 	if whoIsServing == 'none' then
-		print("player ready to serve")
-		
 		ballSprite:moveTo(player.x + 38, player.y - 20)
 		player:serve()
 		whoIsServing = "player"
 		
 	-- throw to serve
 	else
-		print("throw to serve")
-		
 		ballServing = true
 		local throwBall = ballSprite.y - 30
 		
@@ -364,8 +332,6 @@ local function hitSmash()
 end
 
 local function swing(type)
-	print("call swing() function")
-		
 	gfx.drawLine(player.x + 25, player.y - 20, player.x + 70, player.y-30)
 	gfx.drawLine(player.x + 25, player.y + 10, player.x + 70, player.y+20)
 	
@@ -387,13 +353,9 @@ local function swing(type)
 end
 
 local function updateScore(who, howMuch)
-	print("update score")
 	score.roundScores[round.round][who] += howMuch
 	
-	print("who" ..tostring(who))
-	
 	if score.roundScores[round.round][who] == score.maxScore then
-		print("game ending event")
 		if round.round == 4 then
 			gameState = "end"
 		else
@@ -409,7 +371,6 @@ local function updateScore(who, howMuch)
 			showDialog = true
 		end
 	else 
-		print("not game ending event, next round instead yo")
 		if who == 2 then
 			whoIsServing = 'coworker'
 		elseif who == 1 then
@@ -425,8 +386,6 @@ local function injurePlayer(player)
 end
 
 local function moveBall()
-	print("moveBall")
-	
 	if ballMoving or ballServing then
 		
 		-- ball hits table
@@ -474,7 +433,6 @@ local function moveBall()
 			
 			--ball hits player
 			elseif ballSprite.x < 75 then
-				print("ball hits player")
 				updateScore(2,1)
 				showMessage = true
 				resetPoint()
@@ -496,7 +454,6 @@ local function moveBall()
 		-- ball off the screen
 		if ballSprite.x > 400 or ballSprite.x < 0 or ballSprite.y > 240 then
 			if hitType ~= 'smash' and ballMoving == true then
-				print("BALL off screen")
 				if ballLastTouched == "player" then
 					updateScore(2, 1)
 				elseif ballLastTouched == "coworker" then
@@ -516,7 +473,6 @@ local function moveBall()
 		end
 		
 		-- move ball
-		print("moveBall")
 		local verticalSpeed = gravity - ballUpForce
 		ballSprite:moveBy(ballSpeed, verticalSpeed)	
 		
@@ -607,19 +563,12 @@ local function renderUI()
 	if accuracyDisplay['great'][1] then
 		gfx.drawText("GREAT", 100, 130)
 	end
-	-- if accuracyDisplay['good'][1] then
-	-- 	gfx.drawText("GOOD", 100, 130)
-	-- end
-	
 	if accuracyDisplay['perfect'][2] then
 		gfx.drawText("PERFECT", 290, 130)
 	end
 	if accuracyDisplay['great'][2] then
 		gfx.drawText("GREAT", 290, 130)
 	end
-	-- if accuracyDisplay['good'][2] then
-	-- 	gfx.drawText("GOOD", 290, 130)
-	-- end
 	
 	-- point indicator
 	if showMessage then
@@ -677,7 +626,6 @@ function playdate.update()
 			drawDialogue(round.dialog[dialogCount][2], round.dialog[dialogCount][1])
 			
 			if playdate.buttonJustPressed(playdate.kButtonA) then
-				
 				if dialogCount == table.getsize(round.dialog) then
 					showDialog = false
 					
@@ -693,7 +641,6 @@ function playdate.update()
 					
 					desks:drawDesks()
 					dialogCount = 1
-					
 					coworker:moveTo(350, 170)
 					coworker:stance()
 				else
@@ -706,12 +653,10 @@ function playdate.update()
 			
 			-- A just pressed
 			if playdate.buttonJustPressed(playdate.kButtonA) then
-				print("gameplay A just pressed")
 				
 				if ballMoving then
 					swing()
 				elseif whoIsServing == 'player' or whoIsServing == 'none' then
-					print("player about to serve")
 					serve()
 				end
 			end
@@ -765,12 +710,6 @@ function playdate.update()
 			end
 
 			-- Coworker ai
-			
-			print("")
-			print("coworker AI tests")
-			print("ballMoving" .. tostring(ballMoving))
-			print("ballServing" .. tostring(ballServing))
-			
 			if ballMoving and not ballServing then
 				--moveEmployee("coworker")
 				if ballSprite.y > 50 or ballSprite.y < 150 then
@@ -782,39 +721,25 @@ function playdate.update()
 			
 			-- Time
 			if time % timeSpeed == 0 then
-				print("time tick")
-				
-				print("whoIsServing" .. whoIsServing)
-				
 				moveBall()
 				
 				if whoIsServing == 'coworker' then
-					
-					print("")
-					print("coworker is serving!")
-					
-					-- todo: move coworker up and down and then throw for a serve
-						
 					if coworker.hasServed == false then
-						print("coworker hasServed, set timer events")
 						coworker.hasServed = true
 						coworker:serve()
 						ballSprite:moveTo(312, coworker.y - 20)
 						
 						playdate.timer.performAfterDelay(1000, function()
-							print("set coworker.hasServed to false inside timer")
 							coworker.hasServed = false
 						end)
 						
 						playdate.timer.performAfterDelay(1000, function()
-							print("coworker about to serve this was from a timer")
 							serve()
 						end)
 						
 						local swingTiming = 1000 + timeSpeed * 125
 						
 						playdate.timer.performAfterDelay(swingTiming, function()
-							print("coworker swings from a timer")
 							coworkerSwings()
 						end)
 					end
@@ -845,27 +770,17 @@ function playdate.update()
 		story:howToPlay()
 		if playdate.buttonJustPressed(playdate.kButtonA) then
 			
-			print("")
-			print("STARTING A NEW GAME")
-			
-			
-			
+			-- starting a new game
 			initialize()
 			showDialog = true
-			
-			print("ballMoving: " .. tostring(ballMoving))
-			print("whoIsServing: " .. whoIsServing)
-			
 			
 			-- start round 1
 			round:firstRound()
 			coworker.employee = round.opponent
 			coworker:stance()
-			
 			gameState = "play"
 		end
 	elseif gameState == "end" then
-		print("end the game")
 		gfx.sprite.removeAll()
 		gfx.sprite.update()
 		resetScreen()
