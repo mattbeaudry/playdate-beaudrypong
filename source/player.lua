@@ -77,6 +77,7 @@ function Player:new()
 		local paddleY = self.y - 35
 		local x, y = randomPointOnCircle(rRadius, paddleX, paddleY)
 		gfx.drawLine(paddleX, paddleY, x, y)
+		gfx.drawText(self.playerSmashPower, paddleX+10, paddleY-30)
 	end
 	
 	return self

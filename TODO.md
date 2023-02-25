@@ -10,11 +10,12 @@
 	- diff notes for bal bounce sound synth
 	- sound for smash wind up and hit
 	- sound for dialog
+- if crank is not docked, crank to move player
 - office environment movement animation
-- server light flash
-- boss getting up crossing arms from time to time, maybe during a smash windup? 
-- 2 frame animation for each desk employee+state
-- player/coworker stance bounce
+	- server light flash
+	- boss getting up crossing arms from time to time, maybe during a smash windup? 
+	- 2 frame animation for each desk employee+state
+	- player/coworker stance bounce
 - coworker ai improvement
 	- coworker spinCalc is perfect every time because the ai just follows the y position of the ball
 	- not perfect swing every time
@@ -24,8 +25,9 @@
 - cutscene transitions between rounds
 	- current player leaves and desks get trashed
 	- then new player walks up to dialog standing area
+	- screen between winning a round and starting the next round
 - tutorial or better how to 
-- crank to move player and crank to wind the smash
+	- see mockup in notebook
 	
 ## TODO FIXES
 - tweak spin calc sensitivity so gameplay is decent

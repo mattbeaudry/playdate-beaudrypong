@@ -6,12 +6,12 @@ import "CoreLibs/timer"
 import "CoreLibs/animation"
 import "player"
 import "coworker"
-import "boss"
 import "story"
 import "desks"
 import "round"
 import "score"
 import "sound"
+import "streak"
 
 local debug = false
 local gameState = "title"
@@ -20,18 +20,21 @@ local gfx <const> = playdate.graphics
 local snd <const> = playdate.sound
 local blink = gfx.animation.blinker.new()
 
-local font = gfx.font.new('font/Nano Sans 2X/Nano Sans 2X')
-
 local player = Player:new()
 local coworker = Coworker:new()
-local boss = Boss:new()
 local story = Story:new()
 local desks = Desks:new()
 local round = Round:new()
 local score = Score:new()
 local sound = Sound:new()
+
+local streakTop = Streak:new()
+local streakBottom = Streak:new()
+local streakArc = Streak:new()
+
 sound:startMusic()
 
+local font = gfx.font.new('font/Nano Sans 2X/Nano Sans 2X')
 local ball = gfx.image.new("images/ball-outline")
 local tableSprite = gfx.sprite.new(gfx.image.new("images/table"))
 local ballSprite = gfx.sprite.new(ball)
@@ -53,6 +56,7 @@ local ballBounceMultiplier = 1
 local ballSpeedMultiplier = 1
 local ballSpin = 0
 local ballLastTouched = "none"
+local ballStreak = {}
 local playerSpeed = 5
 local whoIsServing = "none"
 local paddleLocation = 0
@@ -217,7 +221,7 @@ local function coworkerHits()
 	-- simulate swing accuracy, random strength and top or bottom spin
 	math.randomseed(playdate.getSecondsSinceEpoch())
 	local r = math.random(1, 2)
-	local offset = -10
+	local offset = -10 
 	if r == 1 then
 		-- bottom spin!
 		-- ballSpin = -ballSpin
@@ -261,7 +265,6 @@ local function coworkerSwings()
 				round:nextRound()
 				coworker.employee = round.opponent
 				coworker:stance()
-				-- boss:add()
 				resetPoint()
 				resetGame()
 				showDialog = true
@@ -305,6 +308,11 @@ local function serve()
 end
 
 local function hit(paddleLocation)
+	streakTop = Streak:new(player.x + 25, player.y - 20, player.x + 70, player.y - 30)
+	streakTop:drawStreak()
+	streakBottom = Streak:new(player.x + 25, player.y + 10, player.x + 70, player.y + 20)
+	streakBottom:drawStreak()
+	
 	ballMoving = true
 	ballServing = false
 	playHitSound()
@@ -326,17 +334,14 @@ local function hitSmash()
 	ballUpForce = hitUpForce + 20
 	ballSpeedMultiplier *= 1.001
 	ballLastTouched = "player"
-	ballSpeed += 70 * ballSpeedMultiplier
+	ballSpeed += (50 + player.playerSmashPower) * ballSpeedMultiplier
 	hitType = "smash"
 	score.stats['smashes'] += 1
 end
 
 local function swing(type)
-	gfx.drawLine(player.x + 25, player.y - 20, player.x + 70, player.y-30)
-	gfx.drawLine(player.x + 25, player.y + 10, player.x + 70, player.y+20)
-	
-	-- swing arc line
-	gfx.drawArc(player.x, player.y, 30, -230, -130)
+	streakArc = Streak:new(player.x, player.y, -130, -230,  30)
+	streakArc:drawArcStreak()
 	
 	player:swing()
 	
@@ -365,7 +370,6 @@ local function updateScore(who, howMuch)
 			timeSpeed = round.timeSpeed
 			coworker.employee = round.opponent
 			coworker:stance()
-			-- boss:add()
 			resetPoint()
 			resetGame()
 			showDialog = true
@@ -474,7 +478,14 @@ local function moveBall()
 		
 		-- move ball
 		local verticalSpeed = gravity - ballUpForce
+		local lineStartPoint = { ballSprite.x, ballSprite.y }
 		ballSprite:moveBy(ballSpeed, verticalSpeed)	
+		local lineEndPoint = { ballSprite.x, ballSprite.y }
+		--if hitType ~= 'smash' then
+			local lineCoordinates = {lineStartPoint[1], lineStartPoint[2], lineEndPoint[1], lineEndPoint[2]}
+			table.insert(ballStreak, lineCoordinates)
+		--end
+		
 		
 		-- use gravity to reduce the ballUpForce
 		if ballUpForce > 5 then
@@ -542,10 +553,14 @@ local function initialize()
 			
 			gfx.clearClipRect()
 		end
-	) 
+	)
 end
 
 local function renderUI()
+	
+	streakTop:update()
+	streakBottom:update()
+	streakArc:update()
 	
 	if debug == false then
 		gfx.drawText("SHITTER HQ", 150, 6)
@@ -576,11 +591,6 @@ local function renderUI()
 		playdate.timer.performAfterDelay(2000, function()
 			showMessage = false
 		end)
-	end
-	
-	-- smash power meter
-	if player.playerSmashPower > 0 then
-		gfx.drawText(player.playerSmashPower, 100, 100)
 	end
 	
 	-- spin gauge
