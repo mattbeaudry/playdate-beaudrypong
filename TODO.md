@@ -1,6 +1,19 @@
 # TODO
 
 ## TODO FEATURES
+
+- walk around the office mode
+   - working mode
+   - like dwarf adventure mode
+   - just chill and walk around, sit at your desk
+   - maybe this is how you browse the main menu
+   - interactive main menu
+- make a shit load of levels
+	- random generated coworker sprites
+	- game slower gradually gets harder/faster
+	- infinite levels
+- alter logic so slow speeds seem less choppy
+
 - smash wind up meter
 	- UI gauge
 	- make it count for how fast the smash is
@@ -11,6 +24,8 @@
 	- sound for smash wind up and hit
 	- sound for dialog
 - if crank is not docked, crank to move player
+
+
 - office environment movement animation
 	- server light flash
 	- boss getting up crossing arms from time to time, maybe during a smash windup? 
@@ -29,15 +44,21 @@
 - tutorial or better how to 
 	- see mockup in notebook
 	
+
+	
 ## TODO FIXES
 - tweak spin calc sensitivity so gameplay is decent
 - only can smash when gauge full
 - higher serve throw
 - move more code out of main file
-- remove unneeded boss class
+
 - ball pauses in thin air once a point is made, after point ball logic, i  t should roll off screen
 - player should be holding ball at beginning of his serve
 - stats are catering too long rallies in rounds
+
+
+
+
 
 ## COMPLETE FEATURES
 - player, table, ball and coworker graphics
@@ -87,9 +108,10 @@
 - things don't reset properly after playing a game and starting a second game
 - improved desk graphics for server developers - missing trashed sprites
 - dialog box width and leading space bug
+- remove unneeded boss class  
 
 # IDEAS
-- what if boss doesn't have a paddle and just hits the ball with his hand
+- what if boss doesn't have a paddle and just hits the ball with his hand, for funnies
 - use the crank, maybe a "super smash" that requires it
 	- crank to aim smash? crank to dodge a coworkers smash
 - what if crank was the vertical position of the player

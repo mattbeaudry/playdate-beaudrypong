@@ -13,7 +13,7 @@ import "score"
 import "sound"
 import "streak"
 
-local debug = false
+local debug = false 
 local gameState = "title"
 
 local gfx <const> = playdate.graphics
