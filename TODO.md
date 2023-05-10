@@ -2,28 +2,19 @@
 
 ## TODO FEATURES
 
-- walk around the office mode
-   - working mode
-   - like dwarf adventure mode
-   - just chill and walk around, sit at your desk
-   - maybe this is how you browse the main menu
-   - interactive main menu
-- make a shit load of levels
-	- random generated coworker sprites
-	- game slower gradually gets harder/faster
-	- infinite levels
-- alter logic so slow speeds seem less choppy
-
 - smash wind up meter
 	- UI gauge
 	- make it count for how fast the smash is
 	- better animation or particle effect for swing AND hit
-	- ball streak animation
-- better sound and theme music
-	- diff notes for bal bounce sound synth
-	- sound for smash wind up and hit
-	- sound for dialog
+	- ball streak animation for smash
+	- coworker gets same effects
 - if crank is not docked, crank to move player
+- coworker ai improvement
+	- coworker spinCalc is perfect every time because the ai just follows the y position of the ball
+	- not perfect swing every time
+	- don't follow ball.y perfectly
+	- move up/down before serving
+	- coworker can smash
 
 
 - office environment movement animation
@@ -31,32 +22,43 @@
 	- boss getting up crossing arms from time to time, maybe during a smash windup? 
 	- 2 frame animation for each desk employee+state
 	- player/coworker stance bounce
-- coworker ai improvement
-	- coworker spinCalc is perfect every time because the ai just follows the y position of the ball
-	- not perfect swing every time
-	- don't follow ball.y perfectly
-	- move up/down before serving
-	- coworker can smash
+- better sound and theme music
+	- diff notes for ball bounce sound synth
+	- sound for smash wind up and hit
+	- sound for dialog
 - cutscene transitions between rounds
 	- current player leaves and desks get trashed
 	- then new player walks up to dialog standing area
 	- screen between winning a round and starting the next round
 - tutorial or better how to 
 	- see mockup in notebook
+
+
+ 
+- walk around the office mode
+   - working mode
+   - like dwarf adventure mode
+   - just chill and walk around, sit at your desk
+   - maybe this is how you browse the main menu
+   - interactive main menu
+- make a shit load of levels 
+	- infinite play through versus 3 game tournament
+	- random generated coworker sprites
+	- game slower gradually gets harder/faster
+	- infinite levels
+	- Hazards? as office collapses you need to dodge debris, fire, live electrical wires
+- alter logic so slow speeds seem less choppy
+	
 	
 
-	
 ## TODO FIXES
 - tweak spin calc sensitivity so gameplay is decent
 - only can smash when gauge full
 - higher serve throw
 - move more code out of main file
-
 - ball pauses in thin air once a point is made, after point ball logic, i  t should roll off screen
 - player should be holding ball at beginning of his serve
 - stats are catering too long rallies in rounds
-
-
 
 
 

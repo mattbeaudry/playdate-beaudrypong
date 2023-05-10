@@ -144,6 +144,7 @@ local function resetPoint()
 	score:calculateScore()
 	player:resetPoint()
 	updateSpinMeter()
+	ballStreak = {}
 end
 
 local function resetGame()
@@ -214,6 +215,13 @@ local function playHitSound()
 end
 
 local function coworkerHits()
+	ballStreak = {}
+	
+	streakTop = Streak:new(coworker.x - 25, coworker.y - 20, coworker.x - 70, coworker.y - 30)
+	streakTop:drawStreak()
+	streakBottom = Streak:new(coworker.x - 25, coworker.y + 10, coworker.x - 70, coworker.y + 20)
+	streakBottom:drawStreak()
+	
 	ballMoving = true
 	ballServing = false
 	playHitSound()
@@ -244,11 +252,8 @@ local function coworkerHits()
 end
 
 local function coworkerSwings()
-	gfx.drawLine(coworker.x-25, coworker.y-20, coworker.x-70, coworker.y-30)
-	gfx.drawLine(coworker.x-25, coworker.y+10, coworker.x-70, coworker.y+20)
-	
-	-- swing arc line
-	gfx.drawArc(coworker.x, coworker.y, 30, -230, -130)
+	streakArc = Streak:new(coworker.x, coworker.y, 230, 130, 30)
+	streakArc:drawArcStreak()
 
 	coworker:swing()
 	math.randomseed(playdate.getSecondsSinceEpoch())
@@ -308,6 +313,8 @@ local function serve()
 end
 
 local function hit(paddleLocation)
+	ballStreak = {}
+	
 	streakTop = Streak:new(player.x + 25, player.y - 20, player.x + 70, player.y - 30)
 	streakTop:drawStreak()
 	streakBottom = Streak:new(player.x + 25, player.y + 10, player.x + 70, player.y + 20)
@@ -476,16 +483,27 @@ local function moveBall()
 			end
 		end
 		
+		local lineStartPoint = { ballSprite.x, ballSprite.y }
+		
 		-- move ball
 		local verticalSpeed = gravity - ballUpForce
-		local lineStartPoint = { ballSprite.x, ballSprite.y }
-		ballSprite:moveBy(ballSpeed, verticalSpeed)	
+		ballSprite:moveBy(ballSpeed, verticalSpeed)
+		
 		local lineEndPoint = { ballSprite.x, ballSprite.y }
-		--if hitType ~= 'smash' then
+		
+		if hitType == 'smash' then
 			local lineCoordinates = {lineStartPoint[1], lineStartPoint[2], lineEndPoint[1], lineEndPoint[2]}
 			table.insert(ballStreak, lineCoordinates)
-		--end
-		
+			
+			if ballStreak then
+				for i = 1, table.getsize(ballStreak) do
+					if ballStreak[i] then
+						gfx.drawLine(ballStreak[i][1], ballStreak[i][2], ballStreak[i][3], ballStreak[i][4])
+					end
+				end
+			end
+			
+		end
 		
 		-- use gravity to reduce the ballUpForce
 		if ballUpForce > 5 then
@@ -660,6 +678,25 @@ function playdate.update()
 		
 		-- game play
 		else
+			
+			-- CRANK to move player
+			if playdate.isCrankDocked() == false then
+				gfx.drawText("CRANK TO MOVE", 200, 100)
+				
+				local crankPosition = playdate.getCrankPosition()
+				gfx.drawText(crankPosition, 200, 120)
+				
+				local crankChange = playdate.getCrankChange()
+				gfx.drawText(crankChange, 200, 140)
+				
+				if (player.y + crankChange) > 30 and (player.y + crankChange < 200) then
+					player:moveBy(0, crankChange)
+				end
+				
+				if whoIsServing == "player" then
+					ballSprite:moveBy(0, crankChange)
+				end
+			end
 			
 			-- A just pressed
 			if playdate.buttonJustPressed(playdate.kButtonA) then
