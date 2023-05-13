@@ -26,6 +26,7 @@ function Coworker:new()
 	self.velocity = 0
 	self.hasSwung = false
 	self.hasServed = false
+	self.randomOffset = 0
 	
 	function self:stance()
 		self:setImage(employeeImages[self.employee.."-stance"], gfx.kImageFlippedX)

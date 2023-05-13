@@ -145,6 +145,7 @@ local function resetPoint()
 	player:resetPoint()
 	updateSpinMeter()
 	ballStreak = {}
+	coworker.randomOffset = 0
 end
 
 local function resetGame()
@@ -328,6 +329,7 @@ local function hit(paddleLocation)
 	ballSpeedMultiplier *= 1.001
 	ballLastTouched = "player"
 	hitType = "normal"
+	coworker.randomOffset = math.random(-100,100)
 	
 	if ballSpeed == 0 then
 		ballSpeed += 20
@@ -760,11 +762,13 @@ function playdate.update()
 			if ballMoving and not ballServing then
 				--moveEmployee("coworker")
 				if ballSprite.y > 50 or ballSprite.y < 150 then
-					coworker:moveTo(coworker.x, ballSprite.y)
+					
+					coworker:moveTo(coworker.x, ballSprite.y + coworker.randomOffset)
+					-- coworker:moveBy(0, randomOffset)
 				end
 			end
 			
-			coworker:moveBy(coworker.velocityX, 0)
+			-- coworker:moveBy(coworker.velocityX, 0)
 			
 			-- Time
 			if time % timeSpeed == 0 then

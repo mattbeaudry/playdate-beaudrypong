@@ -1,27 +1,18 @@
 # TODO
 
 ## TODO FEATURES
-
-- smash wind up meter
-	- UI gauge
-	- make it count for how fast the smash is
-	- better animation or particle effect for swing AND hit
-	- ball streak animation for smash
-	- coworker gets same effects
-- if crank is not docked, crank to move player
 - coworker ai improvement
 	- coworker spinCalc is perfect every time because the ai just follows the y position of the ball
 	- not perfect swing every time
 	- don't follow ball.y perfectly
 	- move up/down before serving
 	- coworker can smash
-
-
 - office environment movement animation
 	- server light flash
 	- boss getting up crossing arms from time to time, maybe during a smash windup? 
 	- 2 frame animation for each desk employee+state
 	- player/coworker stance bounce
+	- wrapper background that adds more fire and disaster as you progress, should be surrounded in fire on the final match with the boss
 - better sound and theme music
 	- diff notes for ball bounce sound synth
 	- sound for smash wind up and hit
@@ -95,6 +86,13 @@
 - saving hi scores
 - viewing hi scores
 - stats on endScree
+- smash wind up meter
+	- UI gauge
+	- make it count for how fast the smash is
+	- better animation or particle effect for swing AND hit
+	- ball streak animation for smash
+	- coworker gets same effects
+- if crank is not docked, crank to move player
 	
 ## COMPLETE FIXES
 - bug fixes / refactoring
