@@ -70,6 +70,7 @@ local gaugeMax = 3
 local gaugeLevel = 0
 local dialogCount = 1
 local accuracyDisplay = {}
+
 accuracyDisplay['perfect'] = { false, false }
 accuracyDisplay['great'] = { false, false }
 accuracyDisplay['good'] = { false, false }
@@ -215,7 +216,7 @@ local function playHitSound()
 	synth:playNote(220)
 end
 
-local function coworkerHits()
+local function coworkerHits(paddleLocation)
 	ballStreak = {}
 	
 	streakTop = Streak:new(coworker.x - 25, coworker.y - 20, coworker.x - 70, coworker.y - 30)
@@ -229,14 +230,7 @@ local function coworkerHits()
 	
 	-- simulate swing accuracy, random strength and top or bottom spin
 	math.randomseed(playdate.getSecondsSinceEpoch())
-	local r = math.random(1, 2)
-	local offset = -10 
-	if r == 1 then
-		-- bottom spin!
-		-- ballSpin = -ballSpin
-		offset = -offset
-	end
-	local paddleLocation = coworker.y + offset
+	
 	calculateSpin(paddleLocation, 'coworker')
 	
 	if ballSpeed == 0 then
@@ -257,32 +251,18 @@ local function coworkerSwings()
 	streakArc:drawArcStreak()
 
 	coworker:swing()
-	math.randomseed(playdate.getSecondsSinceEpoch())
-	local r = math.random(1, 20)
 	
-	if r == 1 then
-		score.roundScores[round.round][1] += 1
-		if score.roundScores[round.round][1] == score.maxScore then 
-			if round.round == 4 then
-				gameState = "end"
-			else
-				-- next round
-				desks:drawDesks()
-				round:nextRound()
-				coworker.employee = round.opponent
-				coworker:stance()
-				resetPoint()
-				resetGame()
-				showDialog = true
-			end
+	if ballSprite.x > 280 then
+		local paddleLocation = coworker.y - 10
+		if paddleLocation < ballSprite.y + 30 and paddleLocation > ballSprite.y - 30 and ballLastTouched ~= "coworker" then
+			-- if type == "smash" then
+				-- hitSmash()
+			-- else
+				coworkerHits(paddleLocation)
+			-- end
 		end
-		
-		showMessage = true
-		resetPoint()
-		resetSprites()
-	else
-		coworkerHits()
 	end
+
 end
 
 local function serve()
@@ -324,12 +304,14 @@ local function hit(paddleLocation)
 	ballMoving = true
 	ballServing = false
 	playHitSound()
+	
 	calculateSpin(paddleLocation, 'player')
 	ballUpForce += hitUpForce
 	ballSpeedMultiplier *= 1.001
 	ballLastTouched = "player"
 	hitType = "normal"
-	coworker.randomOffset = math.random(-100,100)
+	
+	coworker.randomOffset = math.random(-25,25)
 	
 	if ballSpeed == 0 then
 		ballSpeed += 20
@@ -493,6 +475,7 @@ local function moveBall()
 		
 		local lineEndPoint = { ballSprite.x, ballSprite.y }
 		
+		-- draw line streak for a smash
 		if hitType == 'smash' then
 			local lineCoordinates = {lineStartPoint[1], lineStartPoint[2], lineEndPoint[1], lineEndPoint[2]}
 			table.insert(ballStreak, lineCoordinates)
@@ -591,7 +574,7 @@ local function renderUI()
 	gfx.drawText(score.roundScores[round.round][2], 340, 220)
 	gfx.drawText("ROUND: "..round.round, 180, 205)
 	
-	-- accuracy indicator
+	-- accuracy indicator player
 	if accuracyDisplay['perfect'][1] then
 		gfx.drawText("PERFECT", 100, 130)
 	end

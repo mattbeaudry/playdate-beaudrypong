@@ -1,31 +1,6 @@
 # TODO
 
-## TODO FEATURES
-- coworker ai improvement
-	- coworker spinCalc is perfect every time because the ai just follows the y position of the ball
-	- not perfect swing every time
-	- don't follow ball.y perfectly
-	- move up/down before serving
-	- coworker can smash
-- office environment movement animation
-	- server light flash
-	- boss getting up crossing arms from time to time, maybe during a smash windup? 
-	- 2 frame animation for each desk employee+state
-	- player/coworker stance bounce
-	- wrapper background that adds more fire and disaster as you progress, should be surrounded in fire on the final match with the boss
-- better sound and theme music
-	- diff notes for ball bounce sound synth
-	- sound for smash wind up and hit
-	- sound for dialog
-- cutscene transitions between rounds
-	- current player leaves and desks get trashed
-	- then new player walks up to dialog standing area
-	- screen between winning a round and starting the next round
-- tutorial or better how to 
-	- see mockup in notebook
-
-
- 
+## IDEAS 
 - walk around the office mode
    - working mode
    - like dwarf adventure mode
@@ -39,8 +14,33 @@
 	- infinite levels
 	- Hazards? as office collapses you need to dodge debris, fire, live electrical wires
 - alter logic so slow speeds seem less choppy
-	
-	
+- player/coworker stance bounce
+- tutorial or better how to (see mockup in notebook)
+
+
+
+## TODO FEATURES
+- coworker ai improvement
+	- ✅ coworker spinCalc is perfect every time because the ai just follows the y position of the ball
+	- ✅ not perfect swing every time
+	- ✅ don't follow ball.y perfectly
+	- move up/down before serving
+	- coworker can smash
+- office environment movement animation
+	- ✅ server light flash
+	- boss getting up crossing arms from time to time, maybe during a smash windup? 
+	- ✅ 2 frame animation for each desk employee+state
+	- wrapper background that adds more fire and disaster as you progress, should be surrounded in fire on the final match with the boss
+- better sound and theme music
+	- diff notes for ball bounce sound synth
+	- sound for smash wind up and hit
+	- sound for dialog
+- cutscene transitions between rounds
+	- current player leaves and desks get trashed
+	- then new player walks up to dialog standing area
+	- screen between winning a round and starting the next round
+
+
 
 ## TODO FIXES
 - tweak spin calc sensitivity so gameplay is decent
@@ -53,7 +53,7 @@
 
 
 
-## COMPLETE FEATURES
+## ✅ COMPLETE FEATURES
 - player, table, ball and coworker graphics
 - player swing and serve
 - ball movement physics and logic
@@ -94,7 +94,9 @@
 	- coworker gets same effects
 - if crank is not docked, crank to move player
 	
-## COMPLETE FIXES
+	
+
+## ✅ COMPLETE FIXES
 - bug fixes / refactoring
 - coworker graphics alignment when swinging etc.
 - player swinging messes up coworker while serving
@@ -109,9 +111,3 @@
 - improved desk graphics for server developers - missing trashed sprites
 - dialog box width and leading space bug
 - remove unneeded boss class  
-
-# IDEAS
-- what if boss doesn't have a paddle and just hits the ball with his hand, for funnies
-- use the crank, maybe a "super smash" that requires it
-	- crank to aim smash? crank to dodge a coworkers smash
-- what if crank was the vertical position of the player
