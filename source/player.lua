@@ -20,6 +20,7 @@ function Player:new()
 	local self = gfx.sprite.new(playerStance)
 	self.playerSmashPower = 5
 	self.velocity = 0
+	self.canSmash = false
 	
 	function self:stance()
 		self:setImage(playerStance)

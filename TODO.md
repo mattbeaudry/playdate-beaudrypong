@@ -5,8 +5,7 @@
    - working mode
    - like dwarf adventure mode
    - just chill and walk around, sit at your desk
-   - maybe this is how you browse the main menu
-   - interactive main menu
+   - maybe this is how you browse the main menu, interactive main menu?
 - make a shit load of levels 
 	- infinite play through versus 3 game tournament
 	- random generated coworker sprites
@@ -24,7 +23,7 @@
 	- ✅ coworker spinCalc is perfect every time because the ai just follows the y position of the ball
 	- ✅ not perfect swing every time
 	- ✅ don't follow ball.y perfectly
-	- move up/down before serving
+	- ✅ move up/down before serving
 	- coworker can smash
 - office environment movement animation
 	- ✅ server light flash

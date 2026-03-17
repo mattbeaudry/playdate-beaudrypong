@@ -19,7 +19,7 @@ for i = 1, #EMPLOYEES do
 end
 
 function Coworker:new()
-	
+
 	local self = gfx.sprite.new()
 	self.employee = "coworker"
 	self:setImage(employeeImages[self.employee.."-stance"], gfx.kImageFlippedX)
@@ -27,6 +27,8 @@ function Coworker:new()
 	self.hasSwung = false
 	self.hasServed = false
 	self.randomOffset = 0
+	self.distanceToServe = 0
+	self.canSmash = false
 	
 	function self:stance()
 		self:setImage(employeeImages[self.employee.."-stance"], gfx.kImageFlippedX)
@@ -54,10 +56,16 @@ function Coworker:new()
 		self:setImage(employeeImages[self.employee.."-serve"], gfx.kImageFlippedX)
 	end
 	
+	function self:smashWindUp()
+		self:setImage(employeeImages[self.employee.."-smash"], gfx.kImageFlippedX)
+	end
+	
 	function self:talk()
 		self:setImage(employeeImages[self.employee.."-stand"], gfx.kImageFlippedX)
 		self:moveTo(300, 95)
 	end
+	
+	
 	
 	return self
 end

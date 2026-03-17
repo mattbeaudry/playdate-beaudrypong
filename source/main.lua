@@ -13,7 +13,7 @@ import "score"
 import "sound"
 import "streak"
 
-local debug = false 
+local debug = false
 local gameState = "title"
 
 local gfx <const> = playdate.graphics
@@ -32,7 +32,7 @@ local streakTop = Streak:new()
 local streakBottom = Streak:new()
 local streakArc = Streak:new()
 
-sound:startMusic()
+-- sound:startMusic() -- i think this might be the thing slowing the game down
 
 local font = gfx.font.new('font/Nano Sans 2X/Nano Sans 2X')
 local ball = gfx.image.new("images/ball-outline")
@@ -109,6 +109,15 @@ local function updateSpinMeter(accuracy, person)
 	else
 		gaugeLevel -= gaugeChange
 	end
+	
+	player.canSmash = false
+	coworker.canSmash = false
+	
+	if gaugeLevel >= gaugeMax then
+		player.canSmash = true
+	elseif gaugeLevel <= -gaugeMax then
+		coworker.canSmash = true
+	end
 end
 
 local function renderSpinMeter()
@@ -147,6 +156,9 @@ local function resetPoint()
 	updateSpinMeter()
 	ballStreak = {}
 	coworker.randomOffset = 0
+	coworker.distanceToServe = 0
+	player.canSmash = false
+	coworker.canSmash = false
 end
 
 local function resetGame()
@@ -305,13 +317,17 @@ local function hit(paddleLocation)
 	ballServing = false
 	playHitSound()
 	
+	if coworker.canSmash then
+		coworker:smashWindUp()
+	end
+	
 	calculateSpin(paddleLocation, 'player')
 	ballUpForce += hitUpForce
 	ballSpeedMultiplier *= 1.001
 	ballLastTouched = "player"
 	hitType = "normal"
 	
-	coworker.randomOffset = math.random(-25,25)
+	coworker.randomOffset = math.random(-20,20)
 	
 	if ballSpeed == 0 then
 		ballSpeed += 20
@@ -365,9 +381,12 @@ local function updateScore(who, howMuch)
 			resetGame()
 			showDialog = true
 		end
-	else 
+	else
 		if who == 2 then
 			whoIsServing = 'coworker'
+			coworker.distanceToServe = math.random(1,150)
+			coworker:serve()
+			ballSprite:moveTo(312, coworker.y - 40)
 		elseif who == 1 then
 			whoIsServing = 'none'
 		end
@@ -405,9 +424,9 @@ local function moveBall()
 						showMessage = true
 						
 						playdate.timer.performAfterDelay(1000, function()
-							updateScore(1,1)
 							resetPoint()
 							resetSprites()
+							updateScore(1,1)
 						end)
 					end
 					
@@ -428,10 +447,10 @@ local function moveBall()
 			
 			--ball hits player
 			elseif ballSprite.x < 75 then
-				updateScore(2,1)
 				showMessage = true
 				resetPoint()
 				resetSprites() 
+				updateScore(2,1)
 			end
 		end
 		
@@ -449,6 +468,9 @@ local function moveBall()
 		-- ball off the screen
 		if ballSprite.x > 400 or ballSprite.x < 0 or ballSprite.y > 240 then
 			if hitType ~= 'smash' and ballMoving == true then
+				resetPoint()
+				resetSprites()
+				
 				if ballLastTouched == "player" then
 					updateScore(2, 1)
 				elseif ballLastTouched == "coworker" then
@@ -461,9 +483,6 @@ local function moveBall()
 						updateScore(1, 1)
 					end
 				end
-				
-				resetPoint()
-				resetSprites()
 			end
 		end
 		
@@ -601,9 +620,10 @@ local function renderUI()
 
 	-- SMASH available indicator
 	if blink.on then
-		if gaugeLevel >= gaugeMax then
+		-- TODO use canSmash variables instead of if statement here
+		if player.canSmash then
 			gfx.drawText("SMASH!", 100, 100)
-		elseif gaugeLevel <= -gaugeMax then
+		elseif coworker.canSmash then
 			gfx.drawText("SMASH!", 300, 100)
 		end
 	end
@@ -613,13 +633,10 @@ local function renderUI()
 		gfx.drawText(math.floor(ballSpin), 192, 205)
 		gfx.drawText("time: " .. seconds .. " BSpeed: " .. ballSpeed .. "  BUpForce: " .. ballUpForce .. "  BBounceHeight: " .. ballBounceHeight, 5, 5)	
 		gfx.drawText("ball.x" .. ballSprite.x .. " ball.y" .. ballSprite.y .. " paddle.y" .. paddleLocation, 5, 30)
-		playdate.drawFPS(100, 100)
-		gfx.drawText(gfx.sprite.spriteCount(), 100, 120)
+		gfx.drawText("FPS: ", 100, 70)
+		playdate.drawFPS(130, 70)
+		gfx.drawText("spriteCount: "..gfx.sprite.spriteCount(), 100, 90)
 	end
-end
-
-local function moveEmployee(employee)
-	coworker.x += coworker.velocityX
 end
 
 function playdate.update()
@@ -707,7 +724,7 @@ function playdate.update()
 				end
 			end
 			
-			-- B just pressed
+			-- B just released
 			if playdate.buttonJustReleased(playdate.kButtonB) then
 				if ballMoving then
 					swing("smash")
@@ -743,25 +760,27 @@ function playdate.update()
 
 			-- Coworker ai
 			if ballMoving and not ballServing then
-				--moveEmployee("coworker")
 				if ballSprite.y > 50 or ballSprite.y < 150 then
 					
 					coworker:moveTo(coworker.x, ballSprite.y + coworker.randomOffset)
 					-- coworker:moveBy(0, randomOffset)
 				end
 			end
-			
-			-- coworker:moveBy(coworker.velocityX, 0)
-			
-			-- Time
-			if time % timeSpeed == 0 then
-				moveBall()
-				
-				if whoIsServing == 'coworker' then
-					if coworker.hasServed == false then
+			if whoIsServing == 'coworker' then
+				if coworker.hasServed == false then
+					
+					print(' ')
+					print('coworker.y: '..coworker.y)
+					print('coworker.distanceToServe: '..coworker.distanceToServe)
+					print('difference: '..coworker.y - coworker.distanceToServe)
+					
+					if (coworker.y - coworker.distanceToServe) >= 0 then
+						coworker:moveBy(0, -1)
+						ballSprite:moveBy(0, -1)
+					else 
 						coworker.hasServed = true
-						coworker:serve()
-						ballSprite:moveTo(312, coworker.y - 20)
+						-- coworker:serve()
+						-- ballSprite:moveTo(312, coworker.y - 20)
 						
 						playdate.timer.performAfterDelay(1000, function()
 							coworker.hasServed = false
@@ -778,6 +797,11 @@ function playdate.update()
 						end)
 					end
 				end
+			end
+			
+			-- Time
+			if time % timeSpeed == 0 then
+				moveBall()
 			end
 			if time % 30 == 0 then
 				seconds += 1
